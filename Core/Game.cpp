@@ -20,11 +20,12 @@ Game::Game()
 
 	//6- Create the enemies
 	//TODO: Add code to create and draw enemies in random places
-
 	//7- Create and clear the status bar
 	clearStatusBar();
+	//intilaization for level and timer ints
+	level = 1;
+	timer = 60 + (level - 1) * 30;
 }
-
 Game::~Game()
 {
 }
@@ -68,7 +69,7 @@ window* Game::CreateWind(int w, int h, int x, int y) const
 	return pW;
 }
 
-void Game::createToolbar() 
+void Game::createToolbar()
 {
 	point toolbarUpperleft;
 	toolbarUpperleft.x = 0;
@@ -94,7 +95,7 @@ void Game::clearBudget() const
 	//Clear Status bar by drawing a filled rectangle
 	pWind->SetPen(config.bkGrndColor, 1);
 	pWind->SetBrush(config.bkGrndColor);
-	pWind->DrawRectangle(config.windWidth - 500, config.toolBarHeight, config.windWidth, 2*config.toolBarHeight);
+	pWind->DrawRectangle(config.windWidth - 500, config.toolBarHeight, config.windWidth, 2 * config.toolBarHeight);
 }
 
 void Game::printBudget(string msg) const
@@ -103,7 +104,7 @@ void Game::printBudget(string msg) const
 
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(24, BOLD, BY_NAME, "Arial");
-	pWind->DrawString(config.windWidth-200, config.toolBarHeight + 10, msg);
+	pWind->DrawString(config.windWidth - 200, config.toolBarHeight + 10, msg);
 
 }
 
@@ -124,14 +125,33 @@ void Game::printMessage(string msg) const
 	pWind->DrawString(10, config.windHeight - (int)(0.85 * config.statusBarHeight), msg);
 
 }
+void Game::drawstats() const {
+	clearStatusBar();
 
+	pWind->SetPen(config.penColor, 50);
+	pWind->SetFont(20, BOLD, BY_NAME, "Arial");
+
+	int y_pos = config.windHeight - config.statusBarHeight + 10;
+
+	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level);
+
+	pWind->DrawString(10, y_pos, timelevelmsg);
+}
+void Game::updatetimer() {
+	time_t currenttime = time(0);
+	if ((currenttime - lasttime) > 1) {
+		timer--;
+		lasttime = currenttime;
+	}
+}
 window* Game::getWind() const
 {
 	return pWind;
 }
 
-void Game::go() const
+void Game::go()
 {
+	printMessage("Entered go()");
 	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	bool isExit = false;
@@ -141,9 +161,8 @@ void Game::go() const
 
 	do
 	{
-		printMessage("Ready...");
-		string budget_string = "BUDGET = $" + to_string(budget);
-		printBudget(budget_string);
+		updatetimer();
+		drawstats();
 		//printBudget("BUDGET = $1000");
 		getMouseClick(x, y);	//Get the coordinates of the user click
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
@@ -153,7 +172,7 @@ void Game::go() const
 		{
 			isExit = gameToolbar->handleClick(x, y);
 		}
-		else if (y >= config.toolBarHeight && y < 2*config.toolBarHeight)
+		else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
 		{
 			isExit = gameBudgetbar->handleClick(x, y);
 		}
