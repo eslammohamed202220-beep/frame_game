@@ -125,7 +125,7 @@ void Game::printMessage(string msg) const
 	pWind->DrawString(10, config.windHeight - (int)(0.85 * config.statusBarHeight), msg);
 
 }
-void Game::drawstats() const {
+void Game::writeStatus() const {
 	clearStatusBar();
 
 	pWind->SetPen(config.penColor, 50);
