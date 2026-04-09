@@ -137,7 +137,7 @@ void Game::writeStatus() const {
 
 	pWind->DrawString(10, y_pos, timelevelmsg);
 }
-void Game::updatetimer() {
+void Game::updateTimer() {
 	time_t currenttime = time(0);
 	if ((currenttime - lasttime) > 1) {
 		timer--;

@@ -31,8 +31,8 @@ public:
 	void printBudget(string msg) const;
 	void clearStatusBar() const;	//Clears the status bar
 
-	void drawstats() const;			//Draw in stats par
-	void updatetimer();
+	void writeStatus() const;			//Draw in stats par
+	void updateTimer();
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	void go();
