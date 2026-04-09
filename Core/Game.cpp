@@ -159,6 +159,8 @@ void Game::go()
 	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
 
+
+
 	do
 	{
 		updatetimer();
