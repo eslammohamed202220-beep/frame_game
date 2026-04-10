@@ -83,3 +83,28 @@ void Cow::moveStep()
 	draw();
 
 }
+Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path) {}
+void Wolf::moveStep() {
+	//TO DO: add code for cleanup and game exit here
+	window* pWind = pGame->getWind();
+	pWind->SetPen(WHITE, 1);
+	pWind->SetBrush(WHITE);
+	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height);
+
+	int dx = (rand() % 3) - 1;
+	int dy = (rand() % 3) - 1;
+
+	int newX = RefPoint.x + dx * 20;
+	int newY = RefPoint.y + dy * 20;
+
+	if (newX < 0) newX = 0;
+	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
+	if (newX > config.windWidth - width) newX = config.windWidth - width;
+	if (newY > config.windHeight - config.statusBarHeight - height) newY = config.windHeight - config.statusBarHeight - height;
+
+	RefPoint.x = newX;
+	RefPoint.y = newY;
+
+	draw();
+
+}
