@@ -163,8 +163,8 @@ void Game::go()
 
 	do
 	{
-		updatetimer();
-		drawstats();
+		updateTimer();
+		writeStatus();
 		//printBudget("BUDGET = $1000");
 		getMouseClick(x, y);	//Get the coordinates of the user click
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
