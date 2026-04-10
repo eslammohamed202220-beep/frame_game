@@ -142,6 +142,29 @@ void Game::updateTimer() {
 		lasttime = currenttime;
 	}
 }
+void Game::Wolfadd() {
+
+	if (timer % 12 == 0&& wolf_Show) {
+		point p;
+		std::random_device rd1;
+		std::mt19937 gen1(rd1());
+		std::uniform_int_distribution<int> dist1(0, config.windWidth - 100);
+		p.x = dist1(gen1);
+		std::random_device rd2;
+		std::mt19937 gen2(rd2());
+		std::uniform_int_distribution<int> dist2(2 * config.toolBarHeight, config.windHeight - config.statusBarHeight - 100);
+		p.y = dist2(gen2);
+		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images\\wolf.webp");
+		animalsList[animalCount]->draw();
+		animalCount++;
+		wolf_Show = true;
+	}
+	if (timer % 12 !=0) {
+		wolf_Show = false;
+	}
+	
+}
+
 window* Game::getWind() const
 {
 	return pWind;
@@ -166,6 +189,7 @@ void Game::go()
 		for (int i = 0; i < animalCount; i++) {
 			animalsList[i]->moveStep();
 		}
+		Wolfadd();
 		//printBudget("BUDGET = $1000");
 		getMouseClick(x, y);	//Get the coordinates of the user click
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode

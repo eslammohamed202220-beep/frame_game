@@ -15,6 +15,7 @@ private:
 	int level;
 	time_t lasttime = time(0);;
 	time_t currenttime;
+	bool wolf_Show = false;
 
 public:
 	int budget = 2000;
@@ -35,6 +36,7 @@ public:
 	void clearStatusBar() const;	//Clears the status bar
 	void writeStatus() const;			//Draw in stats par
 	void updateTimer();
+	void Wolfadd();
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	void go();

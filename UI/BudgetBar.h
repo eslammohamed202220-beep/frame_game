@@ -43,7 +43,6 @@ public:
 
 
 
-
 // TO DO: The rest of icons in the toolbar
 
 enum ANIMAL_ICONS //The icons of the toolbar (you should add more icons)

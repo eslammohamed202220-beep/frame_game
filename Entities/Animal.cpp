@@ -105,6 +105,4 @@ void Wolf::moveStep() {
 	RefPoint.x = newX;
 	RefPoint.y = newY;
 
-	draw();
-
-}
+	draw();}
