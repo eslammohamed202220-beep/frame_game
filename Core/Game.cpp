@@ -154,7 +154,7 @@ void Game::Wolfadd() {
 		std::mt19937 gen2(rd2());
 		std::uniform_int_distribution<int> dist2(2 * config.toolBarHeight, config.windHeight - config.statusBarHeight - 100);
 		p.y = dist2(gen2);
-		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images\\wolf.jpg");
+		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images\\wolff.jpg");
 		animalsList[animalCount]->draw();
 		animalCount++;
 		wolf_Show = true;
