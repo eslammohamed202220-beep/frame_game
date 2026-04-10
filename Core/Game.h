@@ -2,6 +2,7 @@
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
+#include "../Entities/Animal.h"
 #include <ctime>
 
 class Game
@@ -17,6 +18,8 @@ private:
 
 public:
 	int budget = 2000;
+	Animal* animalsList[100];
+	int animalCount = 0;
 	Game();
 	~Game();
 
@@ -30,7 +33,6 @@ public:
 	void clearBudget() const;
 	void printBudget(string msg) const;
 	void clearStatusBar() const;	//Clears the status bar
-
 	void writeStatus() const;			//Draw in stats par
 	void updateTimer();
 	void printMessage(string msg) const;	//Print a message on Status bar

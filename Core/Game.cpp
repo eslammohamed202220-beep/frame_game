@@ -9,9 +9,7 @@ Game::Game()
 	//2 - create and draw the toolbar
 	createToolbar();
 	createBudgetbar();
-	//3 - create and draw the backgroundPlayingArea
-
-
+	//3 - create and draw the backgroundPlayingAr
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -165,6 +163,9 @@ void Game::go()
 	{
 		updateTimer();
 		writeStatus();
+		for (int i = 0; i < animalCount; i++) {
+			animalsList[i]->moveStep();
+		}
 		//printBudget("BUDGET = $1000");
 		getMouseClick(x, y);	//Get the coordinates of the user click
 		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode

@@ -2,14 +2,16 @@
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
 #include <iostream>
+#include <cstdlib>
+
 using namespace std;
 
 Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Drawable(r_pGame, r_point, r_width, r_height)
 {
 	image_path = img_path;
 	curr_pos = r_point;
-	curr_vel.x = 1;
-	curr_vel.y = 1;
+	curr_vel.x=1;
+	curr_vel.y=1;
 
 }
 
@@ -31,7 +33,11 @@ void Chick::moveStep()
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	*/
-	cout << "Icon Chick Clicked" << endl;
+	int dx = (rand() % 3) - 1;  
+	int dy = (rand() % 3) - 1;
+	RefPoint.x += dx;
+	RefPoint.y += dy;
+	draw();
 }
 
 Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
@@ -40,6 +46,11 @@ Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_pat
 void Cow::moveStep()
 {
 	//TO DO: add code for cleanup and game exit here
+	int dx = (rand() % 3) - 1;
+	int dy = (rand() % 3) - 1;
+	RefPoint.x += dx;
+	RefPoint.y += dy;
+	draw();
 	cout << "Icon Cow Clicked" << endl;
 
 }
