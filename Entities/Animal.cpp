@@ -33,10 +33,25 @@ void Chick::moveStep()
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	*/
-	int dx = (rand() % 3) - 1;  
+	window* pWind = pGame->getWind();
+	pWind->SetPen(WHITE, 1);
+	pWind->SetBrush(WHITE);
+	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height);
+
+	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
-	RefPoint.x += dx;
-	RefPoint.y += dy;
+
+	int newX = RefPoint.x + dx * 20;
+	int newY = RefPoint.y + dy * 20;
+
+	if (newX < 0) newX = 0;
+	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
+	if (newX > config.windWidth - width) newX = config.windWidth - width;
+	if (newY > config.windHeight - config.statusBarHeight - height) newY = config.windHeight - config.statusBarHeight - height;
+
+	RefPoint.x = newX;
+	RefPoint.y = newY;
+
 	draw();
 }
 
@@ -46,11 +61,25 @@ Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_pat
 void Cow::moveStep()
 {
 	//TO DO: add code for cleanup and game exit here
+	window* pWind = pGame->getWind();
+	pWind->SetPen(WHITE, 1);
+	pWind->SetBrush(WHITE);
+	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height);
+
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
-	RefPoint.x += dx;
-	RefPoint.y += dy;
+
+	int newX = RefPoint.x + dx * 20;
+	int newY = RefPoint.y + dy * 20;
+
+	if (newX < 0) newX = 0;
+	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
+	if (newX > config.windWidth - width) newX = config.windWidth - width;
+	if (newY > config.windHeight - config.statusBarHeight - height) newY = config.windHeight - config.statusBarHeight - height;
+
+	RefPoint.x = newX;
+	RefPoint.y = newY;
+
 	draw();
-	cout << "Icon Cow Clicked" << endl;
 
 }
