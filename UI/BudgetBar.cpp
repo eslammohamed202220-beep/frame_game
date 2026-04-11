@@ -127,7 +127,7 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 {
 	//First prepare List of images for each icon
 	//To control the order of these images in the menu, reoder them in enum ICONS above	
-	iconsImages[ICON_CHICK] = "images/chick.jpg";
+	iconsImages[ICON_CHICK] = "images/chick.png";
 	iconsImages[ICON_COW] = "images/cow.jpg";
 
 	point p;
