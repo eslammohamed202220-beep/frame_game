@@ -82,6 +82,10 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(OutDir)images\" mkdir "$(OutDir)images\"
+xcopy /Y /Q "$(ProjectDir)images\*.*" "$(OutDir)images\"</Command>
+    </PostBuildEvent>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Release/graphics_prj.bsc</OutputFile>
@@ -121,6 +125,10 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(OutDir)images\" mkdir "$(OutDir)images\"
+xcopy /Y /Q "$(ProjectDir)images\*.*" "$(OutDir)images\"</Command>
+    </PostBuildEvent>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Debug/graphics_prj.bsc</OutputFile>

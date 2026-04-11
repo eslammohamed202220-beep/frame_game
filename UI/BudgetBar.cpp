@@ -1,6 +1,7 @@
 #include "Budgetbar.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
+#include "../CMUgraphicsLib/error.h"
 #include <iostream>
 using namespace std;
 
@@ -12,9 +13,18 @@ BudgetbarIcon::BudgetbarIcon(Game* r_pGame, point r_point, int r_width, int r_he
 
 void BudgetbarIcon::draw() const
 {
-	//draw image of this object
 	window* pWind = pGame->getWind();
-	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+	try
+	{
+		image img(image_path);
+		pWind->DrawImage(img, RefPoint.x, RefPoint.y, width, height);
+	}
+	catch (error)
+	{
+		pWind->SetPen(BLUE, 2);
+		pWind->SetBrush(LIGHTGRAY);
+		pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height, FRAME);
+	}
 }
 
 ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
@@ -117,8 +127,8 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 {
 	//First prepare List of images for each icon
 	//To control the order of these images in the menu, reoder them in enum ICONS above	
-	iconsImages[ICON_CHICK] = "images\\chick.jpg";
-	iconsImages[ICON_COW] = "images\\cow.jpg";
+	iconsImages[ICON_CHICK] = "images/chick.jpg";
+	iconsImages[ICON_COW] = "images/cow.jpg";
 
 	point p;
 	p.x = 0;

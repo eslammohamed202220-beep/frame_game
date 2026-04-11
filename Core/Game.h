@@ -27,7 +27,6 @@ public:
 	clicktype getMouseClick(int& x, int& y) const; //Get coordinate where user clicks and returns click type (left/right)
 	string getSrting() const;	 //Returns a string entered by the user
 
-
 	window* CreateWind(int, int, int, int) const; //creates the game window
 	void createToolbar();
 	void createBudgetbar();
@@ -39,8 +38,13 @@ public:
 	void Wolfadd();
 	void printMessage(string msg) const;	//Print a message on Status bar
 
+	// Drawing helpers for the playing field
+	void drawBackground() const;
+	void drawWarehouse() const;
+	void drawFieldBoundaries() const;
+	void redrawScene() const;
+
 	void go();
 
 	window* getWind() const;		//returns a pointer to the graphics window
 };
-

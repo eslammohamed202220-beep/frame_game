@@ -1,6 +1,7 @@
 #include "Animal.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
+#include "../CMUgraphicsLib/error.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -10,39 +11,61 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 {
 	image_path = img_path;
 	curr_pos = r_point;
-	curr_vel.x=1;
-	curr_vel.y=1;
-
+	curr_vel.x = 1;
+	curr_vel.y = 1;
 }
 
 void Animal::draw() const
 {
-	//draw image of this object
 	window* pWind = pGame->getWind();
-	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+	auto tryPath = [&](const string& path) -> bool
+	{
+		try
+		{
+			image img(path);
+			pWind->DrawImage(img, RefPoint.x, RefPoint.y, width, height);
+			return true;
+		}
+		catch (error)
+		{
+			return false;
+		}
+	};
+
+	if (tryPath(image_path))
+		return;
+
+	string alt = image_path;
+	for (char& c : alt)
+	{
+		if (c == '\\')
+			c = '/';
+	}
+	if (alt != image_path && tryPath(alt))
+		return;
+
+	pWind->SetPen(RED, 2);
+	pWind->SetBrush(LIGHTGRAY);
+	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height, FRAME);
 }
 
 Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
-{}
+{
+}
 
 void Chick::moveStep()
 {
 	//TO DO: add code for cleanup and game exit here
-	/*
-	//draw image of this object in the field
-	window* pWind = pGame->getWind();
-	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
-	*/
-	window* pWind = pGame->getWind();
-	pWind->SetPen(WHITE, 1);
-	pWind->SetBrush(WHITE);
-	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height);
+
+	// Frequency: Moves roughly every 4-5 frames
+	if ((rand() % 4) != 0) return;
 
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
 
-	int newX = RefPoint.x + dx * 20;
-	int newY = RefPoint.y + dy * 20;
+	// Jump size: Lowered to 15 pixels
+	int newX = RefPoint.x + dx * 15;
+	int newY = RefPoint.y + dy * 15;
 
 	if (newX < 0) newX = 0;
 	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
@@ -51,26 +74,25 @@ void Chick::moveStep()
 
 	RefPoint.x = newX;
 	RefPoint.y = newY;
-
-	draw();
 }
 
 Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
-{}
+{
+}
 
 void Cow::moveStep()
 {
 	//TO DO: add code for cleanup and game exit here
-	window* pWind = pGame->getWind();
-	pWind->SetPen(WHITE, 1);
-	pWind->SetBrush(WHITE);
-	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height);
+
+	// Frequency: Moves roughly every 8-10 frames
+	if ((rand() % 8) != 0) return;
 
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
 
-	int newX = RefPoint.x + dx * 20;
-	int newY = RefPoint.y + dy * 20;
+	// Jump size: Lowered to 12 pixels
+	int newX = RefPoint.x + dx * 12;
+	int newY = RefPoint.y + dy * 12;
 
 	if (newX < 0) newX = 0;
 	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
@@ -79,21 +101,23 @@ void Cow::moveStep()
 
 	RefPoint.x = newX;
 	RefPoint.y = newY;
-
-	draw();
-
 }
-Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path) {}
-void Wolf::moveStep() {
+
+Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
+{
+}
+
+void Wolf::moveStep()
+{
 	//TO DO: add code for cleanup and game exit here
-	window* pWind = pGame->getWind();
-	pWind->SetPen(WHITE, 1);
-	pWind->SetBrush(WHITE);
-	pWind->DrawRectangle(RefPoint.x, RefPoint.y, RefPoint.x + width, RefPoint.y + height);
+
+	// Frequency: Wolves move about 30% of the time
+	if ((rand() % 3) != 0) return;
 
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
 
+	// Jump size: Lowered to 20 pixels
 	int newX = RefPoint.x + dx * 20;
 	int newY = RefPoint.y + dy * 20;
 
@@ -104,5 +128,4 @@ void Wolf::moveStep() {
 
 	RefPoint.x = newX;
 	RefPoint.y = newY;
-
-	draw();}
+}

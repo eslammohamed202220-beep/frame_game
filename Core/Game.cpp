@@ -1,15 +1,49 @@
 #include "Game.h"
 #include "../Config/GameConfig.h"
+#include "../CMUgraphicsLib/error.h"
+#include <random>
+
+namespace {
+
+// CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
+bool tryDrawJpeg(window* pWind, const char* path, int x, int y, int w, int h)
+{
+	try
+	{
+		image img(path);
+		pWind->DrawImage(img, x, y, w, h);
+		return true;
+	}
+	catch (error)
+	{
+		return false;
+	}
+}
+
+} // namespace
 
 Game::Game()
 {
+	// Initialization for logic
+	animalCount = 0;
+	budget = 1000;
+	wolf_Show = false;
+
 	//1 - Create the main window
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
+
+	// CRITICAL: Set buffering ONCE in constructor to avoid "BitBlt" Fatal Error
+	pWind->SetBuffering(true);
 
 	//2 - create and draw the toolbar
 	createToolbar();
 	createBudgetbar();
-	//3 - create and draw the backgroundPlayingAr
+
+	//3 - create and draw the playing field (background, warehouse, boundary outline)
+	drawBackground();
+	drawWarehouse();
+	drawFieldBoundaries();
+
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -18,20 +52,36 @@ Game::Game()
 
 	//6- Create the enemies
 	//TODO: Add code to create and draw enemies in random places
+
 	//7- Create and clear the status bar
 	clearStatusBar();
+
 	//intilaization for level and timer ints
 	level = 1;
 	timer = 60 + (level - 1) * 30;
+	lasttime = time(0);
+
+	printBudget("BUDGET = $" + to_string(budget));
+	writeStatus();
+
+	pWind->UpdateBuffer();
 }
+
 Game::~Game()
 {
+	// Clean up all allocated memory to prevent leaks
+	for (int i = 0; i < animalCount; i++)
+	{
+		if (animalsList[i]) delete animalsList[i];
+	}
+	delete gameToolbar;
+	delete gameBudgetbar;
+	delete pWind;
 }
 
 clicktype Game::getMouseClick(int& x, int& y) const
 {
 	return pWind->WaitMouseClick(x, y);	//Wait for mouse click
-
 }
 
 string Game::getSrting() const
@@ -87,23 +137,21 @@ void Game::createBudgetbar()
 	gameBudgetbar->draw();
 }
 
-
 void Game::clearBudget() const
 {
-	//Clear Status bar by drawing a filled rectangle
+	//Clear Budget area by drawing a filled rectangle
 	pWind->SetPen(config.bkGrndColor, 1);
 	pWind->SetBrush(config.bkGrndColor);
-	pWind->DrawRectangle(config.windWidth - 500, config.toolBarHeight, config.windWidth, 2 * config.toolBarHeight);
+	pWind->DrawRectangle(config.windWidth - 340, config.toolBarHeight, config.windWidth, 2 * config.toolBarHeight);
 }
 
 void Game::printBudget(string msg) const
 {
-	clearBudget();	//First clear the status bar
+	clearBudget();	//First clear the budget area
 
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(24, BOLD, BY_NAME, "Arial");
-	pWind->DrawString(config.windWidth - 200, config.toolBarHeight + 10, msg);
-
+	pWind->DrawString(config.windWidth - 250, config.toolBarHeight + 10, msg);
 }
 
 void Game::clearStatusBar() const
@@ -121,9 +169,10 @@ void Game::printMessage(string msg) const
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(24, BOLD, BY_NAME, "Arial");
 	pWind->DrawString(10, config.windHeight - (int)(0.85 * config.statusBarHeight), msg);
-
 }
-void Game::writeStatus() const {
+
+void Game::writeStatus() const
+{
 	clearStatusBar();
 
 	pWind->SetPen(config.penColor, 50);
@@ -135,34 +184,125 @@ void Game::writeStatus() const {
 
 	pWind->DrawString(10, y_pos, timelevelmsg);
 }
-void Game::updateTimer() {
-	time_t currenttime = time(0);
-	if ((currenttime - lasttime) > 1) {
-		timer--;
-		lasttime = currenttime;
+
+void Game::updateTimer()
+{
+	time_t now = time(0);
+
+	if (timer > 0 && now > lasttime)
+	{
+		timer -= (int)(now - lasttime);
+		if (timer < 0)
+			timer = 0;
+
+		lasttime = now;
+
+		// Reset wolf spawn trigger every second
+		wolf_Show = false;
 	}
 }
-void Game::Wolfadd() {
 
-	if (timer % 11 == 0&& !wolf_Show) {
+void Game::Wolfadd()
+{
+	if (animalCount >= 100)
+		return;
+
+	// Spawns exactly one wolf when timer hits a multiple of 11
+	if (timer > 0 && timer % 11 == 0 && !wolf_Show)
+	{
 		point p;
+
 		std::random_device rd1;
 		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(0, config.windWidth - 100);
+		std::uniform_int_distribution<int> dist1(10, config.windWidth - 100);
 		p.x = dist1(gen1);
+
 		std::random_device rd2;
 		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(2 * config.toolBarHeight, config.windHeight - config.statusBarHeight - 100);
+		std::uniform_int_distribution<int> dist2(2 * config.toolBarHeight + 50, config.windHeight - config.statusBarHeight - 150);
 		p.y = dist2(gen2);
-		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images\\wolff.jpg");
-		animalsList[animalCount]->draw();
+
+		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images/wolff.jpg");
 		animalCount++;
 		wolf_Show = true;
 	}
-	if (timer % 11 !=0) {
-		wolf_Show = false;
+}
+
+void Game::drawBackground() const
+{
+	int playY = 2 * config.toolBarHeight;
+	int playH = config.windHeight - config.statusBarHeight - playY;
+
+	// Solid fallback if no JPEG can be loaded (wrong working directory, missing file, etc.)
+	pWind->SetPen(LAVENDER);
+	pWind->SetBrush(LAVENDER);
+	pWind->DrawRectangle(0, playY, config.windWidth, config.windHeight - config.statusBarHeight);
+
+	static const char* kBgPaths[] = {
+		"images/Background.jpg",
+		"images\\Background.jpg",
+		"../images/Background.jpg",
+		"..\\images\\Background.jpg",
+	};
+
+	for (const char* path : kBgPaths)
+	{
+		if (tryDrawJpeg(pWind, path, 0, playY, config.windWidth, playH))
+			return;
 	}
-	
+}
+
+void Game::drawFieldBoundaries() const
+{
+	int topY = 2 * config.toolBarHeight;
+	int bottomY = config.windHeight - config.statusBarHeight;
+
+	// CMUgraphics DrawRectangle defaults to FILLED; a filled rect would paint over the background image.
+	pWind->SetPen(DARKGREEN, 4);
+	pWind->DrawRectangle(0, topY, config.windWidth, bottomY, FRAME);
+}
+
+void Game::drawWarehouse() const
+{
+	int playY = 2 * config.toolBarHeight;
+	const int warehouseW = 220;
+	const int warehouseH = 180;
+	int wx = config.windWidth - warehouseW - 30;
+	int wy = playY + 20;
+
+	static const char* kWarehousePaths[] = {
+		"images/Warehouse.jpg",
+		"images\\Warehouse.jpg",
+		"../images/Warehouse.jpg",
+		"..\\images\\Warehouse.jpg",
+	};
+
+	for (const char* path : kWarehousePaths)
+	{
+		if (tryDrawJpeg(pWind, path, wx, wy, warehouseW, warehouseH))
+			return;
+	}
+}
+
+void Game::redrawScene() const
+{
+	drawBackground();
+	drawWarehouse();
+	drawFieldBoundaries();
+
+	for (int i = 0; i < animalCount; i++)
+	{
+		if (animalsList[i] != nullptr)
+			animalsList[i]->draw();
+	}
+
+	gameToolbar->draw();
+	gameBudgetbar->draw();
+
+	printBudget("BUDGET = $" + to_string(budget));
+	writeStatus();
+
+	pWind->UpdateBuffer();
 }
 
 window* Game::getWind() const
@@ -173,39 +313,39 @@ window* Game::getWind() const
 void Game::go()
 {
 	printMessage("Entered go()");
-	//This function reads the position where the user clicks to determine the desired operation
 	int x, y;
 	bool isExit = false;
 
-	//Change the title
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
-
-
 
 	do
 	{
 		updateTimer();
-		writeStatus();
-		for (int i = 0; i < animalCount; i++) {
-			animalsList[i]->moveStep();
+
+		for (int i = 0; i < animalCount; i++)
+		{
+			if (animalsList[i] != nullptr)
+				animalsList[i]->moveStep();
 		}
+
 		Wolfadd();
-		//printBudget("BUDGET = $1000");
-		getMouseClick(x, y);	//Get the coordinates of the user click
-		//if (gameMode == MODE_DSIGN)		//Game is in the Desgin mode
-		//{
-			//[1] If user clicks on the Toolbar
-		if (y >= 0 && y < config.toolBarHeight)
+		redrawScene();
+
+		clicktype ct = pWind->GetMouseClick(x, y);
+
+		if (ct != NO_CLICK)
 		{
-			isExit = gameToolbar->handleClick(x, y);
+			if (y >= 0 && y < config.toolBarHeight)
+			{
+				isExit = gameToolbar->handleClick(x, y);
+			}
+			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+			{
+				isExit = gameBudgetbar->handleClick(x, y);
+			}
 		}
-		else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
-		{
-			isExit = gameBudgetbar->handleClick(x, y);
-		}
-		//}
+
+		Sleep(60);
 
 	} while (!isExit);
 }
-
-
