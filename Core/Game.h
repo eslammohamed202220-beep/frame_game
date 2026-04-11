@@ -16,11 +16,14 @@ private:
 	time_t lasttime = time(0);;
 	time_t currenttime;
 	bool wolf_Show = false;
+	bool egg_show = false;
 
 public:
 	int budget = 2000;
 	Animal* animalsList[100];
+	Chick* chickList[100];
 	int animalCount = 0;
+	int chickCount = 0;
 	Game();
 	~Game();
 
@@ -36,6 +39,7 @@ public:
 	void writeStatus() const;			//Draw in stats par
 	void updateTimer();
 	void Wolfadd();
+	void eggadd();
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	// Drawing helpers for the playing field

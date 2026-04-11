@@ -2,7 +2,7 @@
 #include "../Config/GameConfig.h"
 #include "../CMUgraphicsLib/error.h"
 #include <random>
-
+#include"../UI/BudgetBar.h"
 namespace {
 
 // CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
@@ -207,7 +207,7 @@ void Game::Wolfadd()
 	if (animalCount >= 100)
 		return;
 
-	// Spawns exactly one wolf when timer hits a multiple of 11
+	
 	if (timer > 0 && timer % 11 == 0 && !wolf_Show)
 	{
 		point p;
@@ -225,6 +225,21 @@ void Game::Wolfadd()
 		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images/wolff.jpg");
 		animalCount++;
 		wolf_Show = true;
+	}
+}
+
+void Game::eggadd()
+{
+	
+	if (timer > 0 && timer % 10 == 0 && !egg_show)
+	{
+		for (int i = 0; i < chickCount; i++)
+		{
+			if (chickList[i] != nullptr)
+				chickList[i]->egg();
+		}
+
+		egg_show = true;
 	}
 }
 
@@ -329,6 +344,7 @@ void Game::go()
 		}
 
 		Wolfadd();
+		eggadd();
 		redrawScene();
 
 		clicktype ct = pWind->GetMouseClick(x, y);

@@ -129,3 +129,12 @@ void Wolf::moveStep()
 	RefPoint.x = newX;
 	RefPoint.y = newY;
 }
+void Chick::egg()
+{
+	point egg_position;
+	egg_position.x = RefPoint.x + 20;
+	egg_position.y = RefPoint.y + 20;
+
+	
+	pGame->getWind()->DrawImage("images\\egg.jpg",egg_position.x,egg_position.y,30,30);
+}
