@@ -206,9 +206,10 @@ void Game::updateTimer()
 
 		lasttime = now;
 
-		// Reset wolf spawn trigger every second
+		
 		wolf_Show = false;
 		egg_show = false;
+		milk_show = false;
 	}
 }
 

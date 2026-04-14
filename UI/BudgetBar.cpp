@@ -121,7 +121,7 @@ void CowIcon::onClick()
 		pGame->animalsList[pGame->animalCount] = cowList[count];
 		pGame->cowList[pGame->cowCount] = cowList[count];
 		pGame->animalCount++;
-		pGame->chickCount++;
+		pGame->cowCount++;
 		count++;
 	}
 }

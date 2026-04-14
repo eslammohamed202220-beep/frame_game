@@ -31,7 +31,7 @@ public:
 		point pos;
 		string type;
 	};
-	Item* ItemList[100] = { nullptr };
+	Item* ItemList[100];
 	int ItemCount = 0;
 	Game();
 	~Game();
