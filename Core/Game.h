@@ -17,13 +17,22 @@ private:
 	time_t currenttime;
 	bool wolf_Show = false;
 	bool egg_show = false;
+	bool milk_show = false;
 
 public:
 	int budget = 2000;
 	Animal* animalsList[100];
 	Chick* chickList[100];
+	Cow* cowList[100];
 	int animalCount = 0;
 	int chickCount = 0;
+	int cowCount = 0;
+	struct Item {
+		point pos;
+		string type; 
+	};
+	Item  ItemList[100];
+	int ItemCount = 0;
 	Game();
 	~Game();
 
@@ -40,6 +49,7 @@ public:
 	void updateTimer();
 	void Wolfadd();
 	void eggadd();
+	void milkadd();
 	void printMessage(string msg) const;	//Print a message on Status bar
 
 	// Drawing helpers for the playing field

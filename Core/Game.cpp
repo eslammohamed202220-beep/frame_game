@@ -199,6 +199,7 @@ void Game::updateTimer()
 
 		// Reset wolf spawn trigger every second
 		wolf_Show = false;
+		egg_show = false;
 	}
 }
 
@@ -230,7 +231,6 @@ void Game::Wolfadd()
 
 void Game::eggadd()
 {
-	
 	if (timer > 0 && timer % 10 == 0 && !egg_show)
 	{
 		for (int i = 0; i < chickCount; i++)
@@ -238,8 +238,19 @@ void Game::eggadd()
 			if (chickList[i] != nullptr)
 				chickList[i]->egg();
 		}
-
 		egg_show = true;
+	}
+}
+void Game::milkadd()
+{
+	if (timer > 0 && timer % 15 == 0 && !milk_show)
+	{
+		for (int i = 0; i < cowCount; i++)
+		{
+			if (cowList[i] != nullptr)
+				cowList[i]->milk();
+		}
+		milk_show = true;
 	}
 }
 
@@ -310,6 +321,13 @@ void Game::redrawScene() const
 		if (animalsList[i] != nullptr)
 			animalsList[i]->draw();
 	}
+for (int i = 0; i < ItemCount; i++)
+{
+    if (ItemList[i].type == "egg")
+        pWind->DrawImage("images\\egg.jpg", ItemList[i].pos.x, ItemList[i].pos.y, 30, 30);
+    else if (ItemList[i].type == "milk")
+        pWind->DrawImage("images\\milk.jpg", ItemList[i].pos.x, ItemList[i].pos.y, 30, 30);
+}
 
 	gameToolbar->draw();
 	gameBudgetbar->draw();
@@ -345,6 +363,7 @@ void Game::go()
 
 		Wolfadd();
 		eggadd();
+
 		redrawScene();
 
 		clicktype ct = pWind->GetMouseClick(x, y);

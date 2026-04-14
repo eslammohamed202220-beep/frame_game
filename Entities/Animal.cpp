@@ -131,10 +131,19 @@ void Wolf::moveStep()
 }
 void Chick::egg()
 {
-	point egg_position;
-	egg_position.x = RefPoint.x + 20;
-	egg_position.y = RefPoint.y + 20;
-
-	
-	pGame->getWind()->DrawImage("images\\egg.jpg",egg_position.x,egg_position.y,30,30);
+	Game::Item item;
+	item.x = RefPoint.x + 20;
+	item.y = RefPoint.y + 20;
+	item.type = "egg";
+	pGame->ItemList[pGame->ItemCount] = item;
+	pGame->ItemCount++;
+}
+void Cow::milk()
+{
+	Game::Item item;
+	item.x = RefPoint.x + 20;
+	item.y = RefPoint.y + 20;
+	item.type = "milk";
+	pGame->ItemList[pGame->ItemCount] = item;
+	pGame->ItemCount++;
 }

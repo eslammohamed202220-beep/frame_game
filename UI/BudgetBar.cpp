@@ -119,7 +119,9 @@ void CowIcon::onClick()
 		cowList[count] = new Cow(pGame, p, 60, 60, image_path);
 		cowList[count]->draw();
 		pGame->animalsList[pGame->animalCount] = cowList[count];
+		pGame->cowList[pGame->cowCount] = cowList[count];
 		pGame->animalCount++;
+		pGame->chickCount++;
 		count++;
 	}
 }
