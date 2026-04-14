@@ -131,19 +131,17 @@ void Wolf::moveStep()
 }
 void Chick::egg()
 {
-	Game::Item item;
-	item.x = RefPoint.x + 20;
-	item.y = RefPoint.y + 20;
-	item.type = "egg";
-	pGame->ItemList[pGame->ItemCount] = item;
-	pGame->ItemCount++;
+	point eggPos;
+	eggPos.x = RefPoint.x + 20;
+	eggPos.y = RefPoint.y + 20;
+	pGame->eggList[pGame->eggCount] = eggPos;
+	pGame->eggCount++;
 }
 void Cow::milk()
 {
-	Game::Item item;
-	item.x = RefPoint.x + 20;
-	item.y = RefPoint.y + 20;
-	item.type = "milk";
-	pGame->ItemList[pGame->ItemCount] = item;
-	pGame->ItemCount++;
+	point milkPos;
+	milkPos.x = RefPoint.x + 20;
+	milkPos.y = RefPoint.y + 20;
+	pGame->milkList[pGame->milkCount] = milkPos;
+	pGame->milkCount++;
 }

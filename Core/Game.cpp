@@ -28,7 +28,12 @@ Game::Game()
 	animalCount = 0;
 	budget = 1000;
 	wolf_Show = false;
-
+	for (int i = 0; i < 100; i++)
+	{
+		chickList[i] = nullptr;
+		cowList[i] = nullptr;
+		animalsList[i] = nullptr;
+	}
 	//1 - Create the main window
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
 
@@ -321,13 +326,18 @@ void Game::redrawScene() const
 		if (animalsList[i] != nullptr)
 			animalsList[i]->draw();
 	}
-for (int i = 0; i < ItemCount; i++)
-{
-    if (ItemList[i].type == "egg")
-        pWind->DrawImage("images\\egg.jpg", ItemList[i].pos.x, ItemList[i].pos.y, 30, 30);
-    else if (ItemList[i].type == "milk")
-        pWind->DrawImage("images\\milk.jpg", ItemList[i].pos.x, ItemList[i].pos.y, 30, 30);
-}
+	for (int i = 0; i < eggCount; i++)
+	{
+		pWind->DrawImage("images\\egg.jpg",
+			eggList[i].x,
+			eggList[i].y, 30, 30);
+	}
+	for (int i = 0; i < milkCount; i++)
+	{
+		pWind->DrawImage("images\\milk.jpg",
+			milkList[i].x,
+			milkList[i].y, 30, 30);
+	}
 
 	gameToolbar->draw();
 	gameBudgetbar->draw();
