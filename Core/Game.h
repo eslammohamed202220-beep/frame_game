@@ -27,10 +27,12 @@ public:
 	int animalCount = 0;
 	int chickCount = 0;
 	int cowCount = 0;
-	point eggList[70];
-	int eggCount = 0;
-	point milkList[70];
-	int milkCount = 0;
+	struct Item {
+		point pos;
+		string type;
+	};
+	Item* ItemList[100] = { nullptr };
+	int ItemCount = 0;
 	Game();
 	~Game();
 
