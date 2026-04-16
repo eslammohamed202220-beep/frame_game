@@ -31,6 +31,7 @@ Game::Game()
 	animalCount = 0;
 	budget = 1000;
 	wolf_Show = false;
+	
 	for (int i = 0; i < 100; i++)
 	{
 		animalsList[i] = nullptr;
@@ -221,8 +222,8 @@ void Game::Wolfadd()
 	if (animalCount >= 100)
 		return;
 
-	
-	if (timer > 0 && randNum < 20 * level && !wolf_Show )
+	randNum = rand() % 100;
+	if (timer > 0 && randNum < 3 * level && !wolf_Show )
 	{
 		point p;
 

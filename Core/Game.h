@@ -27,8 +27,7 @@ public:
 	int animalCount = 0;
 	int chickCount = 0;
 	int cowCount = 0;
-	
-	int randNum = rand() % 100;
+	int randNum;
 	struct Item {
 		point pos;
 		string type;
