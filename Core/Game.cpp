@@ -320,11 +320,30 @@ void Game::drawWarehouse() const
 	}
 }
 
+void Game::drawFoodArea() const
+{
+	int x = 20;
+	int y = config.windHeight - config.statusBarHeight - 200;
+	int width = 1000;
+	int height = 150;
+
+	pWind->SetPen(DARKGREEN, 2);
+	pWind->SetBrush(LIGHTGREEN);
+	pWind->DrawRectangle(x, y, x + width, y + height, FILLED);
+
+	pWind->DrawRectangle(x, y, x + width, y + height, FRAME);
+
+	pWind->SetPen(BLACK, 1);
+	pWind->DrawString(x + 5, y - 18, "Food Area");
+}
+
 void Game::redrawScene() const
 {
 	drawBackground();
 	drawWarehouse();
 	drawFieldBoundaries();
+	drawFoodArea();
+
 
 	for (int i = 0; i < animalCount; i++)
 	{

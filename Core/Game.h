@@ -57,7 +57,7 @@ public:
 	void drawWarehouse() const;
 	void drawFieldBoundaries() const;
 	void redrawScene() const;
-
+	void drawFoodArea()const;
 	void go();
 
 	window* getWind() const;		//returns a pointer to the graphics window
