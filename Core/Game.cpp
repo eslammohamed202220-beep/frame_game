@@ -193,7 +193,7 @@ void Game::writeStatus() const
 
 	int y_pos = config.windHeight - config.statusBarHeight + 10;
 
-	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level);
+	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level) + " | Current animals number = " + to_string(animalCount);
 
 	pWind->DrawString(10, y_pos, timelevelmsg);
 }
