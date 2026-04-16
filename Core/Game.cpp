@@ -3,6 +3,8 @@
 #include "../CMUgraphicsLib/error.h"
 #include <random>
 #include"../UI/BudgetBar.h"
+#include <cstdlib>
+#include <ctime>
 namespace {
 
 // CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
@@ -25,6 +27,7 @@ bool tryDrawJpeg(window* pWind, const char* path, int x, int y, int w, int h)
 Game::Game()
 {
 	// Initialization for logic
+	srand(time(0));
 	animalCount = 0;
 	budget = 1000;
 	wolf_Show = false;
@@ -219,7 +222,7 @@ void Game::Wolfadd()
 		return;
 
 	
-	if (timer > 0 && timer % 11 == 0 && !wolf_Show)
+	if (timer > 0 && randNum < 20 * level && !wolf_Show )
 	{
 		point p;
 
