@@ -82,6 +82,7 @@ public:
 	void Wolfadd();
 	void eggadd();
 	void milkadd();
+	void collectItems(int x, int y);
 
 	// Main loop
 	void go();
