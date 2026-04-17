@@ -37,7 +37,8 @@ public:
 	int animalCount = 0;
 	int chickCount = 0;
 	int cowCount = 0;
-
+	int eggInWareHouse = 0;
+	int milkInWareHouse = 0;
 	int randNum;
 
 	struct Item
