@@ -303,6 +303,27 @@ void Game::milkadd()
 		milk_show = true;
 	}
 }
+void Game::collectItems(int x,int y) {
+	for (int i = 0; i < ItemCount; i++) {
+		if (ItemList[i] != nullptr) {
+			if ((x >= ItemList[i]->pos.x && x <= ItemList[i]->pos.x + 30) &&
+				(y >= ItemList[i]->pos.y && y <= ItemList[i]->pos.y + 30)) {
+				if (ItemList[i]->type == "egg") {
+					eggInWareHouse++;
+					delete ItemList[i];
+					ItemList[i] = nullptr;
+					break;
+				}
+				else if (ItemList[i]->type == "milk") {
+					milkInWareHouse++;
+					delete ItemList[i];
+					ItemList[i] = nullptr;
+					break;
+				}
+			}
+		}
+	}
+}
 
 // ==========================
 // Drawing
@@ -442,9 +463,9 @@ void Game::go()
 		redrawScene();
 
 		clicktype ct = pWind->GetMouseClick(x, y);
-
 		if (ct != NO_CLICK)
 		{
+			collectItems(x, y);
 			if (y >= 0 && y < config.toolBarHeight)
 			{
 				isExit = gameToolbar->handleClick(x, y);
