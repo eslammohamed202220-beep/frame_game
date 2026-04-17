@@ -5,24 +5,29 @@
 #include"../UI/BudgetBar.h"
 #include <cstdlib>
 #include <ctime>
+
 namespace {
 
-// CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
-bool tryDrawJpeg(window* pWind, const char* path, int x, int y, int w, int h)
-{
-	try
+	// CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
+	bool tryDrawJpeg(window* pWind, const char* path, int x, int y, int w, int h)
 	{
-		image img(path);
-		pWind->DrawImage(img, x, y, w, h);
-		return true;
+		try
+		{
+			image img(path);
+			pWind->DrawImage(img, x, y, w, h);
+			return true;
+		}
+		catch (error)
+		{
+			return false;
+		}
 	}
-	catch (error)
-	{
-		return false;
-	}
-}
 
 } // namespace
+
+// ==========================
+// Constructors / Destructor
+// ==========================
 
 Game::Game()
 {
@@ -31,7 +36,7 @@ Game::Game()
 	animalCount = 0;
 	budget = 1000;
 	wolf_Show = false;
-	
+
 	for (int i = 0; i < 100; i++)
 	{
 		animalsList[i] = nullptr;
@@ -92,6 +97,10 @@ Game::~Game()
 	delete pWind;
 }
 
+// ==========================
+// Input
+// ==========================
+
 clicktype Game::getMouseClick(int& x, int& y) const
 {
 	return pWind->WaitMouseClick(x, y);	//Wait for mouse click
@@ -121,6 +130,10 @@ string Game::getSrting() const
 	}
 }
 
+// ==========================
+// Window / UI Creation
+// ==========================
+
 window* Game::CreateWind(int w, int h, int x, int y) const
 {
 	window* pW = new window(w, h, x, y);
@@ -149,6 +162,15 @@ void Game::createBudgetbar()
 	gameBudgetbar = new Budgetbar(this, budgetbarUpperleft, 0, config.toolBarHeight);
 	gameBudgetbar->draw();
 }
+
+window* Game::getWind() const
+{
+	return pWind;
+}
+
+// ==========================
+// Status / Budget Display
+// ==========================
 
 void Game::clearBudget() const
 {
@@ -198,6 +220,10 @@ void Game::writeStatus() const
 	pWind->DrawString(10, y_pos, timelevelmsg);
 }
 
+// ==========================
+// Game Logic
+// ==========================
+
 void Game::updateTimer()
 {
 	time_t now = time(0);
@@ -210,7 +236,7 @@ void Game::updateTimer()
 
 		lasttime = now;
 
-		
+
 		wolf_Show = false;
 		egg_show = false;
 		milk_show = false;
@@ -223,7 +249,7 @@ void Game::Wolfadd()
 		return;
 
 	randNum = rand() % 100;
-	if (timer > 0 && randNum < 3 * level && !wolf_Show )
+	if (timer > 0 && randNum < 3 * level && !wolf_Show)
 	{
 		point p;
 
@@ -255,6 +281,7 @@ void Game::eggadd()
 		egg_show = true;
 	}
 }
+
 void Game::milkadd()
 {
 	if (timer > 0 && timer % 15 == 0 && !milk_show)
@@ -267,6 +294,10 @@ void Game::milkadd()
 		milk_show = true;
 	}
 }
+
+// ==========================
+// Drawing
+// ==========================
 
 void Game::drawBackground() const
 {
@@ -373,10 +404,9 @@ void Game::redrawScene() const
 	pWind->UpdateBuffer();
 }
 
-window* Game::getWind() const
-{
-	return pWind;
-}
+// ==========================
+// Main Loop
+// ==========================
 
 void Game::go()
 {

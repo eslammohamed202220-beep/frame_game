@@ -8,58 +8,84 @@
 class Game
 {
 private:
+	// Window and UI
 	window* pWind;	//Pointer to the CMU graphics window
 	Toolbar* gameToolbar;
 	Budgetbar* gameBudgetbar;
+
+	// Game state
 	int timer;
 	int level;
-	time_t lasttime = time(0);;
+
+	// Time handling
+	time_t lasttime = time(0);
 	time_t currenttime;
+
+	// Display flags
 	bool wolf_Show = false;
 	bool egg_show = false;
 	bool milk_show = false;
 
 public:
+	// Public game data
 	int budget = 2000;
+
 	Animal* animalsList[100];
 	Chick* chickList[100];
 	Cow* cowList[100];
+
 	int animalCount = 0;
 	int chickCount = 0;
 	int cowCount = 0;
+
 	int randNum;
-	struct Item {
+
+	struct Item
+	{
 		point pos;
 		string type;
 	};
+
 	Item* ItemList[100];
 	int ItemCount = 0;
+
+	// Constructors / Destructor
 	Game();
 	~Game();
 
-	clicktype getMouseClick(int& x, int& y) const; //Get coordinate where user clicks and returns click type (left/right)
-	string getSrting() const;	 //Returns a string entered by the user
+	// Input
+	clicktype getMouseClick(int& x, int& y) const;
+	string getSrting() const;
 
-	window* CreateWind(int, int, int, int) const; //creates the game window
+	// Window and UI creation
+	window* CreateWind(int, int, int, int) const;
 	void createToolbar();
 	void createBudgetbar();
+
+	// Status / Budget
 	void clearBudget() const;
 	void printBudget(string msg) const;
-	void clearStatusBar() const;	//Clears the status bar
-	void writeStatus() const;			//Draw in stats par
-	void updateTimer();
-	void Wolfadd();
-	void eggadd();
-	void milkadd();
-	void printMessage(string msg) const;	//Print a message on Status bar
+	void clearStatusBar() const;
+	void writeStatus() const;
+	void printMessage(string msg) const;
+	void warehouseContent() const;
 
-	// Drawing helpers for the playing field
+	// Drawing helpers
 	void drawBackground() const;
 	void drawWarehouse() const;
 	void drawFieldBoundaries() const;
 	void redrawScene() const;
-	void drawFoodArea()const;
+	void drawFoodArea() const;
+
+	// Game logic
+	void updateTimer();
+	void Wolfadd();
+	void eggadd();
+	void milkadd();
+
+	// Main loop
 	void go();
 
-	window* getWind() const;		//returns a pointer to the graphics window
+	// Window access
+	window* getWind() const;
 };
