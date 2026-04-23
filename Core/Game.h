@@ -42,10 +42,16 @@ public:
 	int eggInWareHouse = 0;
 	int milkInWareHouse = 0;
 	int randNum;
-	bool greenAreaPlaced = false;
-	int greenAreaX = 0;
-	int greenAreaY = 0;
+	// add green area
+	struct GreenArea {
+		int x, y;
+		int counter;
+		bool active;
+	};
+	GreenArea greenAreas[50];
+	int greenAreaCount = 0;
 
+	// add egg and milk
 	struct Item
 	{
 		point pos;
@@ -54,7 +60,8 @@ public:
 
 	Item* ItemList[100];
 	int ItemCount = 0;
-
+	//for pause and resume 
+	bool isPaused = false;
 	// Constructors / Destructor
 	Game();
 	~Game();
@@ -91,6 +98,7 @@ public:
 	void eggadd();
 	void milkadd();
 	void collectItems(int x, int y);
+	void restartGame();
 
 	// Main loop
 	void go();

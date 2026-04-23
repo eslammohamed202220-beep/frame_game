@@ -1,4 +1,4 @@
-#include "Game.h"
+﻿#include "Game.h"
 #include "../Config/GameConfig.h"
 #include "../CMUgraphicsLib/error.h"
 #include <random>
@@ -254,10 +254,15 @@ void Game::updateTimer()
 		timer -= (int)(now - lasttime);
 		if (timer < 0)
 			timer = 0;
-
+		// remove green area after counter reaches 0
+		for (int i = 0; i < greenAreaCount; i++)
+		{
+			if (!greenAreas[i].active) continue;
+			greenAreas[i].counter--;
+			if (greenAreas[i].counter <= 0)
+				greenAreas[i].active = false;
+		}
 		lasttime = now;
-
-
 		wolf_Show = false;
 		egg_show = false;
 		milk_show = false;
@@ -336,10 +341,35 @@ void Game::collectItems(int x, int y) {
 		}
 	}
 }
+void Game::restartGame()
+{
 
-// ==========================
-// Drawing
-// ==========================
+	for (int i = 0; i < animalCount; i++)
+	{
+		delete animalsList[i];
+		animalsList[i] = nullptr;
+	}
+	animalCount = 0;
+	chickCount = 0;
+	cowCount = 0;
+	budget = 1000;
+	timer = 60 + (level - 1) * 30;
+	lasttime = time(0);
+
+	
+	greenAreaCount = 0;
+
+	
+	for (int i = 0; i < ItemCount; i++)
+	{
+		delete ItemList[i];
+		ItemList[i] = nullptr;
+	}
+	ItemCount = 0;
+
+	redrawScene();
+}
+
 
 void Game::drawBackground() const
 {
@@ -412,18 +442,20 @@ void Game::drawFoodArea()const
 }
 void Game::drawGreenArea()
 {
-	int foodX = 20;
-	int foodY = config.windHeight - config.statusBarHeight - 200;
-	int foodW = 1000;
-	int foodH = 150;
+	if (greenAreaCount >= 50) return;
 
+	int foodX = 0;
+	int foodY = config.windHeight - config.statusBarHeight - 180;
+	int foodW = 1200;
+	int foodH = 170;
 	int areaW = 50;
 	int areaH = 40;
 
-	int rx = foodX + rand() % (foodW - areaW);
-	int ry = foodY + rand() % (foodH - areaH);
-	greenAreaPlaced = true;
-
+	greenAreas[greenAreaCount].x = foodX + rand() % (foodW - areaW);
+	greenAreas[greenAreaCount].y = foodY + rand() % (foodH - areaH);
+	greenAreas[greenAreaCount].counter = 25;
+	greenAreas[greenAreaCount].active = true;
+	greenAreaCount++;
 }
 void Game::redrawScene() const
 {
@@ -448,18 +480,25 @@ void Game::redrawScene() const
 				pWind->DrawImage("images\\milk.jpg", ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
 		}
 	}
-	gameToolbar->draw();
-	gameBudgetbar->draw();
-
-	printBudget("BUDGET = $" + to_string(budget));
-	writeStatus();
-	if (greenAreaPlaced)
+	for (int i = 0; i < greenAreaCount; i++)
 	{
+		if (!greenAreas[i].active) continue;
+
 		pWind->SetPen(DARKGREEN, 2);
 		pWind->SetBrush(GREEN);
-		pWind->DrawRectangle(greenAreaX, greenAreaY, greenAreaX + 100, greenAreaY + 80, FILLED);
+		pWind->DrawRectangle(greenAreas[i].x, greenAreas[i].y,
+			greenAreas[i].x + 50, greenAreas[i].y + 40, FILLED);
+
+		pWind->SetPen(BLACK, 1);
+		pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+		pWind->DrawString(greenAreas[i].x + 15, greenAreas[i].y - 18,
+			to_string(greenAreas[i].counter));
 	}
 
+	gameToolbar->draw();
+	gameBudgetbar->draw();
+	printBudget("BUDGET = $" + to_string(budget));
+	writeStatus();
 	pWind->UpdateBuffer();
 }
 
@@ -477,12 +516,15 @@ void Game::go()
 
 	do
 	{
-		updateTimer();
-
-		for (int i = 0; i < animalCount; i++)
+		if (!isPaused)
 		{
-			if (animalsList[i] != nullptr)
-				animalsList[i]->moveStep();
+			updateTimer();
+
+			for (int i = 0; i < animalCount; i++)
+			{
+				if (animalsList[i] != nullptr)
+					animalsList[i]->moveStep();
+			}
 		}
 
 		Wolfadd();
