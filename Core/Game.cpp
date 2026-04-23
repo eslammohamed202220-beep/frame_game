@@ -59,6 +59,7 @@ Game::Game()
 	drawWarehouse();
 	drawFieldBoundaries();
 	warehouseContent();
+	animalCounter();
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -228,6 +229,17 @@ void Game::warehouseContent() const {
 	string timelevelmsg = "  Egg: " + to_string(eggInWareHouse) + " | Milk = " + to_string(milkInWareHouse);
 
 	pWind->DrawString(950, y_pos, timelevelmsg);
+}
+void Game::animalCounter() const {
+	pWind->SetPen(config.penColor, 50);
+	pWind->SetFont(15, BOLD, BY_NAME, "Arial");
+	int y_pos = config.windHeight-490 ;
+	string chickDisplay = "  Chicken: " + to_string(chickCount);
+	string cowDisplay = "  Cow: " + to_string(cowCount);
+	//string chickDisplay = "  Chicken: " + to_string(chickCount)
+
+	pWind->DrawString(5, y_pos, chickDisplay);
+	pWind->DrawString(90, y_pos, cowDisplay);
 }
 // ==========================
 // Game Logic
@@ -409,7 +421,7 @@ void Game::redrawScene() const
 	drawFieldBoundaries();
 	drawFoodArea();
 	warehouseContent();
-
+	animalCounter();
 	for (int i = 0; i < animalCount; i++)
 	{
 		if (animalsList[i] != nullptr)

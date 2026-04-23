@@ -70,6 +70,7 @@ public:
 	void writeStatus() const;
 	void printMessage(string msg) const;
 	void warehouseContent() const;
+	void animalCounter() const;
 
 	// Drawing helpers
 	void drawBackground() const;
