@@ -95,10 +95,10 @@ Game::~Game()
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete pWind;
-	delete pcowCount;
-	delete pchickCount;
-	delete peggInWareHouse;
-	delete pmilkInWareHouse;
+	//delete pcowCount;
+	//delete pchickCount;
+	//delete peggInWareHouse;
+	//delete pmilkInWareHouse;
 }
 
 // ==========================
