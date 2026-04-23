@@ -95,10 +95,6 @@ Game::~Game()
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete pWind;
-	//delete pcowCount;
-	//delete pchickCount;
-	//delete peggInWareHouse;
-	//delete pmilkInWareHouse;
 }
 
 // ==========================
@@ -229,7 +225,7 @@ void Game::warehouseContent() const {
 
 	int y_pos = config.windHeight - 325;
 
-	string timelevelmsg = "  Egg: " + to_string(*peggInWareHouse) + " | Milk = " + to_string(*pmilkInWareHouse);
+	string timelevelmsg = "  Egg: " + to_string(eggInWareHouse) + " | Milk = " + to_string(milkInWareHouse);
 
 	pWind->DrawString(950, y_pos, timelevelmsg);
 }
@@ -286,7 +282,7 @@ void Game::eggadd()
 {
 	if (timer > 0 && timer % 10 == 0 && !egg_show)
 	{
-		for (int i = 0; i < (*pchickCount); i++)
+		for (int i = 0; i < chickCount; i++)
 		{
 			if (chickList[i] != nullptr)
 				chickList[i]->egg();
@@ -299,7 +295,7 @@ void Game::milkadd()
 {
 	if (timer > 0 && timer % 15 == 0 && !milk_show)
 	{
-		for (int i = 0; i < (*pcowCount); i++)
+		for (int i = 0; i < cowCount; i++)
 		{
 			if (cowList[i] != nullptr)
 				cowList[i]->milk();
@@ -307,19 +303,19 @@ void Game::milkadd()
 		milk_show = true;
 	}
 }
-void Game::collectItems(int x,int y) {
+void Game::collectItems(int x, int y) {
 	for (int i = 0; i < ItemCount; i++) {
 		if (ItemList[i] != nullptr) {
 			if ((x >= ItemList[i]->pos.x && x <= ItemList[i]->pos.x + 30) &&
 				(y >= ItemList[i]->pos.y && y <= ItemList[i]->pos.y + 30)) {
 				if (ItemList[i]->type == "egg") {
-					(*peggInWareHouse)++;
+					eggInWareHouse++;
 					delete ItemList[i];
 					ItemList[i] = nullptr;
 					break;
 				}
 				else if (ItemList[i]->type == "milk") {
-					(*pmilkInWareHouse)++;
+					milkInWareHouse++;
 					delete ItemList[i];
 					ItemList[i] = nullptr;
 					break;

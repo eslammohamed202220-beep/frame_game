@@ -36,13 +36,9 @@ public:
 
 	int animalCount = 0;
 	int chickCount = 0;
-	int* pchickCount = &chickCount;
 	int cowCount = 0;
-	int* pcowCount = &cowCount;
 	int eggInWareHouse = 0;
-	int* peggInWareHouse = &eggInWareHouse;
 	int milkInWareHouse = 0;
-	int* pmilkInWareHouse = &milkInWareHouse;
 	int randNum;
 
 	struct Item
