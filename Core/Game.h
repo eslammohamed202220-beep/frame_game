@@ -25,6 +25,8 @@ private:
 	bool wolf_Show = false;
 	bool egg_show = false;
 	bool milk_show = false;
+	// Water area state
+
 
 public:
 	// Public game data
@@ -40,6 +42,9 @@ public:
 	int eggInWareHouse = 0;
 	int milkInWareHouse = 0;
 	int randNum;
+	bool greenAreaPlaced = false;
+	int greenAreaX = 0;
+	int greenAreaY = 0;
 
 	struct Item
 	{
@@ -77,7 +82,8 @@ public:
 	void drawWarehouse() const;
 	void drawFieldBoundaries() const;
 	void redrawScene() const;
-	void drawFoodArea() const;
+	void drawFoodArea()const;
+	void drawGreenArea();
 
 	// Game logic
 	void updateTimer();

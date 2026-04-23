@@ -64,13 +64,16 @@ void Chick::moveStep()
 	int dy = (rand() % 3) - 1;
 
 	// Jump size: Lowered to 15 pixels
-	int newX = RefPoint.x + dx * 15;
-	int newY = RefPoint.y + dy * 15;
-
-	if (newX < 0) newX = 0;
-	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
-	if (newX > config.windWidth - width) newX = config.windWidth - width;
-	if (newY > config.windHeight - config.statusBarHeight - height) newY = config.windHeight - config.statusBarHeight - height;
+	int newX = RefPoint.x + dx * 10;
+	int newY = RefPoint.y + dy * 10;
+	int foodX = 0;
+	int foodY = config.windHeight - config.statusBarHeight - 180;
+	int foodW = 1200;
+	int foodH = 170;
+	if (newX < foodX) newX = foodX;
+	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
+	if (newY < foodY) newY = foodY;
+	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
 
 	RefPoint.x = newX;
 	RefPoint.y = newY;
@@ -90,14 +93,16 @@ void Cow::moveStep()
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
 
-	// Jump size: Lowered to 12 pixels
 	int newX = RefPoint.x + dx * 12;
 	int newY = RefPoint.y + dy * 12;
-
-	if (newX < 0) newX = 0;
-	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
-	if (newX > config.windWidth - width) newX = config.windWidth - width;
-	if (newY > config.windHeight - config.statusBarHeight - height) newY = config.windHeight - config.statusBarHeight - height;
+	int foodX = 0;
+	int foodY = config.windHeight - config.statusBarHeight - 180;
+	int foodW = 1200;
+	int foodH = 170;
+	if (newX < foodX) newX = foodX;
+	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
+	if (newY < foodY) newY = foodY;
+	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
 
 	RefPoint.x = newX;
 	RefPoint.y = newY;
@@ -109,22 +114,19 @@ Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_p
 
 void Wolf::moveStep()
 {
-	//TO DO: add code for cleanup and game exit here
-
-	// Frequency: Wolves move about 30% of the time
 	if ((rand() % 3) != 0) return;
-
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
-
-	// Jump size: Lowered to 20 pixels
 	int newX = RefPoint.x + dx * 20;
 	int newY = RefPoint.y + dy * 20;
-
-	if (newX < 0) newX = 0;
-	if (newY < 2 * config.toolBarHeight) newY = 2 * config.toolBarHeight;
-	if (newX > config.windWidth - width) newX = config.windWidth - width;
-	if (newY > config.windHeight - config.statusBarHeight - height) newY = config.windHeight - config.statusBarHeight - height;
+	int foodX = 0;
+	int foodY = config.windHeight - config.statusBarHeight - 180;
+	int foodW = 1200;
+	int foodH = 170;
+	if (newX < foodX) newX = foodX;
+	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
+	if (newY < foodY) newY = foodY;
+	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
 
 	RefPoint.x = newX;
 	RefPoint.y = newY;

@@ -40,6 +40,12 @@ public:
 	CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 };
+class WaterIcon : public BudgetbarIcon
+{
+public:
+	WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void onClick();
+};
 
 
 
@@ -54,7 +60,7 @@ enum ANIMAL_ICONS //The icons of the toolbar (you should add more icons)
 	//TODO: Add more icons names here
 
 	//Cow icon
-
+	ICON_WATER,
 	ANIMAL_COUNT		//no. of menu icons ==> This should be the last line in this enum
 };
 

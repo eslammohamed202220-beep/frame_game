@@ -397,23 +397,34 @@ void Game::drawWarehouse() const
 	}
 }
 
-void Game::drawFoodArea() const
+void Game::drawFoodArea()const
 {
-	int x = 20;
-	int y = config.windHeight - config.statusBarHeight - 200;
-	int width = 1000;
-	int height = 150;
+	int x = 0;
+	int y = config.windHeight - config.statusBarHeight - 180;
+	int width = 1200;
+	int height = 170;
 
-	pWind->SetPen(DARKGREEN, 2);
-	pWind->SetBrush(LIGHTGREEN);
-	pWind->DrawRectangle(x, y, x + width, y + height, FILLED);
-
+	pWind->SetPen(BLACK, 2);
 	pWind->DrawRectangle(x, y, x + width, y + height, FRAME);
 
 	pWind->SetPen(BLACK, 1);
 	pWind->DrawString(x + 5, y - 18, "Food Area");
 }
+void Game::drawGreenArea()
+{
+	int foodX = 20;
+	int foodY = config.windHeight - config.statusBarHeight - 200;
+	int foodW = 1000;
+	int foodH = 150;
 
+	int areaW = 50;
+	int areaH = 40;
+
+	int rx = foodX + rand() % (foodW - areaW);
+	int ry = foodY + rand() % (foodH - areaH);
+	greenAreaPlaced = true;
+
+}
 void Game::redrawScene() const
 {
 	drawBackground();
@@ -442,6 +453,12 @@ void Game::redrawScene() const
 
 	printBudget("BUDGET = $" + to_string(budget));
 	writeStatus();
+	if (greenAreaPlaced)
+	{
+		pWind->SetPen(DARKGREEN, 2);
+		pWind->SetBrush(GREEN);
+		pWind->DrawRectangle(greenAreaX, greenAreaY, greenAreaX + 100, greenAreaY + 80, FILLED);
+	}
 
 	pWind->UpdateBuffer();
 }

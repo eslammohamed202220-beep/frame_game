@@ -133,6 +133,7 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 	//To control the order of these images in the menu, reoder them in enum ICONS above	
 	iconsImages[ICON_CHICK] = "images/chick.jpg";
 	iconsImages[ICON_COW] = "images/cow.jpg";
+	iconsImages[ICON_WATER] = "images/water.jpg";
 
 	point p;
 	p.x = 0;
@@ -147,6 +148,9 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 	//p.x += config.iconWidth;
 	//iconsList[ICON_CHICK] = new ChickIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_CHICK]);
 	iconsList[ICON_COW] = new CowIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_COW]);
+	p.x += config.iconWidth;
+
+	iconsList[ICON_WATER] = new WaterIcon(pGame, p, config.iconWidth, config.toolBarHeight, iconsImages[ICON_WATER]);
 	p.x += config.iconWidth;
 }
 
@@ -184,4 +188,22 @@ bool Budgetbar::handleClick(int x, int y)
 
 	return false;
 
+}
+WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
+	: BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
+{
+}
+
+void WaterIcon::onClick()
+{
+	cout << "Icon Water Clicked" << endl;
+
+	if (pGame->budget >= 50)
+	{
+		pGame->budget -= 50;
+		pGame->clearBudget();
+		string budget_string = "BUDGET = $" + to_string(pGame->budget);
+		pGame->printBudget(budget_string);
+		pGame->drawGreenArea();
+	}
 }
