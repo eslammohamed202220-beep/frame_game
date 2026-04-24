@@ -420,10 +420,6 @@ void Game::drawWarehouse() const
 	int wy = playY + 20;
 
 	static const char* kWarehousePaths[] = {
-		"images/Warehouse.jpg",
-		"images\\Warehouse.jpg",
-		"../images/Warehouse.jpg",
-		"..\\images\\Warehouse.jpg",
 	};
 
 	for (const char* path : kWarehousePaths)
