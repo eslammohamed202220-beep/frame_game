@@ -222,13 +222,19 @@ void Game::writeStatus() const
 }
 void Game::warehouseContent() const {
 	pWind->SetPen(config.penColor, 50);
-	pWind->SetFont(20, BOLD, BY_NAME, "Arial");
+	pWind->SetFont(16, BOLD, BY_NAME, "Arial");
 
-	int y_pos = config.windHeight - 325;
+	int y_pos_Structure = config.windHeight -390;
+	string wareHouseStructure = "  Item:  |  Count |  price " ;
+	pWind->DrawString(985, (y_pos_Structure), wareHouseStructure);
 
-	string timelevelmsg = "  Egg: " + to_string(eggInWareHouse) + " | Milk = " + to_string(milkInWareHouse);
+	int y_pos_egg = config.windHeight -370;
+	string egg = "  Egg:   |      " + to_string(eggInWareHouse) + "     |   10 ";
+	pWind->DrawString(985, y_pos_egg, egg);
 
-	pWind->DrawString(950, y_pos, timelevelmsg);
+	int y_pos_milk = config.windHeight -350;
+	string milk = "  Milk:  |      " + to_string(milkInWareHouse) + "      |   20 ";
+	pWind->DrawString(985, y_pos_milk, milk);
 }
 void Game::animalCounter() const {
 	pWind->SetPen(config.penColor, 50);
