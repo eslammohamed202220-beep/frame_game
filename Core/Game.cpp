@@ -424,6 +424,7 @@ void Game::drawWarehouse() const
 		//"images\\Warehouse.jpg",
 		//"../images/Warehouse.jpg",
 		//"..\\images\\Warehouse.jpg",
+		"images/best-shoptest.jpg",
 
 
 	};
