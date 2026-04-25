@@ -447,7 +447,7 @@ void Game::drawGreenArea()
 
 	greenAreas[greenAreaCount].x = foodX + rand() % (foodW - areaW);
 	greenAreas[greenAreaCount].y = foodY + rand() % (foodH - areaH);
-	greenAreas[greenAreaCount].counter = 30;
+	greenAreas[greenAreaCount].counter = 31;
 	greenAreas[greenAreaCount].active = true;
 	greenAreas[greenAreaCount].touched = false;
 	greenAreaCount++;
