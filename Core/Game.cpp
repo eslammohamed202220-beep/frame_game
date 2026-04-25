@@ -578,7 +578,6 @@ void Game::go()
 	bool isExit = false;
 
 	pWind->ChangeTitle("- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
-
 	do
 	{
 		if (!isPaused)
@@ -590,26 +589,41 @@ void Game::go()
 				if (animalsList[i] != nullptr)
 					animalsList[i]->moveStep();
 			}
-		}
 
-		Wolfadd();
-		eggadd();
-		milkadd();
-		checkAnimalGrassCollision();
+			Wolfadd();
+			eggadd();
+			milkadd();
+			checkAnimalGrassCollision();
+		}
+		else
+		{
+			lasttime = time(0);
+		}
 
 		redrawScene();
 
 		clicktype ct = pWind->GetMouseClick(x, y);
 		if (ct != NO_CLICK)
 		{
-			collectItems(x, y);
-			if (y >= 0 && y < config.toolBarHeight)
+			if (isPaused)
 			{
-				isExit = gameToolbar->handleClick(x, y);
+				if (y >= 0 && y < config.toolBarHeight)
+				{
+					isExit = gameToolbar->handleClick(x, y);
+				}
 			}
-			else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+			else
 			{
-				isExit = gameBudgetbar->handleClick(x, y);
+				collectItems(x, y);
+
+				if (y >= 0 && y < config.toolBarHeight)
+				{
+					isExit = gameToolbar->handleClick(x, y);
+				}
+				else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight)
+				{
+					isExit = gameBudgetbar->handleClick(x, y);
+				}
 			}
 		}
 
