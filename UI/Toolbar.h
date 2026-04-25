@@ -1,7 +1,8 @@
 #pragma once
+
 #include "../Core/Drawable.h"
 
-//Base class for all toolbar icons 
+//Base class for all toolbar icons
 class ToolbarIcon :public Drawable
 {
 private:

@@ -107,17 +107,11 @@ void Toolbar::draw() const
 
 bool Toolbar::handleClick(int x, int y)
 {
-	if (x > ICON_COUNT * config.iconWidth)	//click outside toolbar boundaries
+	if (x > ICON_COUNT * config.iconWidth)
 		return false;
 
-
-	//Check whick icon was clicked
-	//==> This assumes that menu icons are lined up horizontally <==
-	//Divide x co-ord of the point clicked by the icon width (int division)
-	//if division result is 0 ==> first icon is clicked, if 1 ==> 2nd icon and so on
-
 	int clickedIconIndex = (x / config.iconWidth);
-	iconsList[clickedIconIndex]->onClick();	//execute onClick action of clicled icon
+	iconsList[clickedIconIndex]->onClick();
 
 	if (clickedIconIndex == ICON_EXIT) return true;
 

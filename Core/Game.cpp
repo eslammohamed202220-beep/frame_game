@@ -367,7 +367,6 @@ void Game::drawBackground() const
 	int playY = 2 * config.toolBarHeight;
 	int playH = config.windHeight - config.statusBarHeight - playY;
 
-	// Solid fallback if no JPEG can be loaded (wrong working directory, missing file, etc.)
 	pWind->SetPen(LAVENDER);
 	pWind->SetBrush(LAVENDER);
 	pWind->DrawRectangle(0, playY, config.windWidth, config.windHeight - config.statusBarHeight);
@@ -391,7 +390,6 @@ void Game::drawFieldBoundaries() const
 	int topY = 2 * config.toolBarHeight;
 	int bottomY = config.windHeight - config.statusBarHeight;
 
-	// CMUgraphics DrawRectangle defaults to FILLED; a filled rect would paint over the background image.
 	pWind->SetPen(DARKGREEN, 4);
 	pWind->DrawRectangle(0, topY, config.windWidth, bottomY, FRAME);
 }
@@ -405,14 +403,9 @@ void Game::drawWarehouse() const
 	int wy = playY + 20;
 
 	static const char* kWarehousePaths[] = {
-		"images/Warehouse.jpg",
-		"images\\Warehouse.jpg",
-		"../images/Warehouse.jpg",
-		"..\\images\\Warehouse.jpg",
-		
-
-
-	};
+    "images/Warehouse.jpg",
+    "../images/Warehouse.jpg"
+};
 
 	for (const char* path : kWarehousePaths)
 	{
