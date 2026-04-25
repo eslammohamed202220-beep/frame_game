@@ -5,7 +5,7 @@
 #include"../UI/BudgetBar.h"
 #include <cstdlib>
 #include <ctime>
-
+using namespace std;
 namespace {
 
 	// CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
@@ -285,15 +285,8 @@ void Game::Wolfadd()
 	{
 		point p;
 
-		std::random_device rd1;
-		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(10, config.windWidth - 100);
-		p.x = dist1(gen1);
-
-		std::random_device rd2;
-		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(2 * config.toolBarHeight + 50, config.windHeight - config.statusBarHeight - 150);
-		p.y = dist2(gen2);
+		p.x = rand() % 1130;
+		p.y = 370 + rand() % 100;
 
 		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images/wolff.jpg");
 		animalCount++;

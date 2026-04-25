@@ -6,10 +6,10 @@
 #include <limits>
 
 //Ranges for generating a random location for the animals
-const int range_min_x = 50;
-const int range_max_x = config.windWidth - 50;
-const int range_min_y = (config.toolBarHeight * 2) + 50;
-const int range_max_y = config.windHeight - config.statusBarHeight - 50;
+const int range_min_x = 0;
+const int range_max_x = 1200 - 60;
+const int range_min_y = config.windHeight - config.statusBarHeight - 180;
+const int range_max_y = config.windHeight - config.statusBarHeight - 180 + 170 - 60;
 
 //Base class for all toolbar icons 
 class BudgetbarIcon :public Drawable

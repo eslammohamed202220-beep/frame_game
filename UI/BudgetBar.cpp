@@ -60,26 +60,8 @@ void ChickIcon::onClick()
 		pGame->printBudget(budget_string);
 
 		point p;
-		// 1. Obtain a seed from a non-deterministic source (if available)
-		std::random_device rd1;
-
-		// 2. Seed the Mersenne Twister engine
-		// std::mt19937 is a high-quality pseudo-random number generator
-		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(range_min_x, range_max_x);
-		p.x = dist1(gen1);
-		//std::cout << "P.X = " << p.x << endl;
-		// 1. Obtain a seed from a non-deterministic source (if available)
-		std::random_device rd2;
-
-		// 2. Seed the Mersenne Twister engine
-		// std::mt19937 is a high-quality pseudo-random number generator
-		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(range_min_y, range_max_y);
-		p.y = dist2(gen2);
-		//std::cout << "P.Y = " << p.y << endl;
-		//p.x = 300;
-		//p.y = 300;
+	    p.x = range_min_x + rand() % (range_max_x - range_min_x);
+        p.y = range_min_y + rand() % (range_max_y - range_min_y);
 		chickList[count]= new Chick(pGame, p, 50, 50, image_path);
 		chickList[count]->draw();
 		pGame->animalsList[pGame->animalCount] = chickList[count]; 
@@ -106,15 +88,8 @@ void CowIcon::onClick()
 
 		point p;
 
-		std::random_device rd1;
-		std::mt19937 gen1(rd1());
-		std::uniform_int_distribution<int> dist1(range_min_x, range_max_x);
-		p.x = dist1(gen1);
-
-		std::random_device rd2;
-		std::mt19937 gen2(rd2());
-		std::uniform_int_distribution<int> dist2(range_min_y, range_max_y);
-		p.y = dist2(gen2);
+		p.x = range_min_x + rand() % (range_max_x - range_min_x);
+		p.y = range_min_y + rand() % (range_max_y - range_min_y);
 
 		cowList[count] = new Cow(pGame, p, 60, 60, image_path);
 		cowList[count]->draw();
