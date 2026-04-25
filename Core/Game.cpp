@@ -8,7 +8,6 @@
 using namespace std;
 namespace {
 
-	// CMUgraphics loads JPEGs in the image ctor and throws error::FILE_NOT_FOUND on failure.
 	bool tryDrawJpeg(window* pWind, const char* path, int x, int y, int w, int h)
 	{
 		try
