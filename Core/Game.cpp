@@ -260,14 +260,7 @@ void Game::updateTimer()
 		timer -= (int)(now - lasttime);
 		if (timer < 0)
 			timer = 0;
-		// remove green area after counter reaches 0
-		for (int i = 0; i < greenAreaCount; i++)
-		{
-			if (!greenAreas[i].active) continue;
-			greenAreas[i].counter--;
-			if (greenAreas[i].counter <= 0)
-				greenAreas[i].active = false;
-		}
+	
 		lasttime = now;
 		wolf_Show = false;
 		egg_show = false;
@@ -455,9 +448,80 @@ void Game::drawGreenArea()
 
 	greenAreas[greenAreaCount].x = foodX + rand() % (foodW - areaW);
 	greenAreas[greenAreaCount].y = foodY + rand() % (foodH - areaH);
-	greenAreas[greenAreaCount].counter = 25;
+	greenAreas[greenAreaCount].counter = 30;
 	greenAreas[greenAreaCount].active = true;
+	greenAreas[greenAreaCount].touched = false;
 	greenAreaCount++;
+}
+void Game::checkAnimalGrassCollision()
+{
+	for (int i = 0; i < greenAreaCount; i++)
+	{
+		if (!greenAreas[i].active)
+			continue;
+
+		bool touchingNow = false;
+
+		int grassW = 50;
+		int grassH = 40;
+
+		
+		for (int j = 0; j < chickCount; j++)
+		{
+			if (chickList[j] == nullptr)
+				continue;
+
+			point animalPos = chickList[j]->getPosition();
+
+			int animalX = animalPos.x;
+			int animalY = animalPos.y;
+
+			int animalW = 60;
+			int animalH = 60;
+
+			if (animalX < greenAreas[i].x + grassW &&
+				animalX + animalW > greenAreas[i].x &&
+				animalY < greenAreas[i].y + grassH &&
+				animalY + animalH > greenAreas[i].y)
+			{
+				touchingNow = true;
+				break;
+			}
+		}
+
+		for (int j = 0; j < cowCount; j++)
+		{
+			if (cowList[j] == nullptr)
+				continue;
+
+			point animalPos = cowList[j]->getPosition();
+
+			int animalX = animalPos.x;
+			int animalY = animalPos.y;
+
+			int animalW = 60;
+			int animalH = 60;
+
+			if (animalX < greenAreas[i].x + grassW &&
+				animalX + animalW > greenAreas[i].x &&
+				animalY < greenAreas[i].y + grassH &&
+				animalY + animalH > greenAreas[i].y)
+			{
+				touchingNow = true;
+				break;
+			}
+		}
+
+		if (touchingNow)
+		{
+			greenAreas[i].counter--;
+
+			if (greenAreas[i].counter <= 0)
+			{
+				greenAreas[i].active = false;
+			}
+		}
+	}
 }
 void Game::redrawScene() const
 {
@@ -532,6 +596,7 @@ void Game::go()
 		Wolfadd();
 		eggadd();
 		milkadd();
+		checkAnimalGrassCollision();
 
 		redrawScene();
 

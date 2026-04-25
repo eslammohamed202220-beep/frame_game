@@ -47,6 +47,7 @@ public:
 		int x, y;
 		int counter;
 		bool active;
+		bool touched;
 	};
 	GreenArea greenAreas[50];
 	int greenAreaCount = 0;
@@ -95,6 +96,7 @@ public:
 	// Game logic
 	void updateTimer();
 	void Wolfadd();
+	void checkAnimalGrassCollision();
 	void eggadd();
 	void milkadd();
 	void collectItems(int x, int y);

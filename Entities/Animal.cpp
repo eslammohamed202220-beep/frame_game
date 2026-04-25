@@ -64,7 +64,7 @@ void Chick::moveStep()
 	int dy = (rand() % 3) - 1;
 
 	// Jump size: Lowered to 15 pixels
-	int newX = RefPoint.x + dx * 10;
+	int newX = RefPoint.x + dx *30;
 	int newY = RefPoint.y + dy * 10;
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
@@ -93,7 +93,7 @@ void Cow::moveStep()
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
 
-	int newX = RefPoint.x + dx * 12;
+	int newX = RefPoint.x + dx * 40;
 	int newY = RefPoint.y + dy * 12;
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
@@ -117,7 +117,7 @@ void Wolf::moveStep()
 	if ((rand() % 3) != 0) return;
 	int dx = (rand() % 3) - 1;
 	int dy = (rand() % 3) - 1;
-	int newX = RefPoint.x + dx * 20;
+	int newX = RefPoint.x + dx * 50;
 	int newY = RefPoint.y + dy * 20;
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;

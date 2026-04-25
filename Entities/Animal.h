@@ -11,6 +11,10 @@ public:
 	Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void draw() const override;
 	virtual void moveStep() = 0;   //The action that should be taken each time step
+	point getPosition() const
+	{
+		return RefPoint;
+	}
 };
 
 class Chick : public Animal
