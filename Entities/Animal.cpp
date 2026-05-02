@@ -133,19 +133,17 @@ void Wolf::moveStep()
 }
 void Chick::egg()
 {
-	if (pGame->ItemCount >= 100) return;
 	Game::Item* item = new Game::Item();
 	item->pos.x = RefPoint.x + 20;
 	item->pos.y = RefPoint.y + 20;
 	item->type = "egg";
-	pGame->ItemList[pGame->ItemCount++] = item;
+	pGame->ItemList.push_back(item);
 }
 void Cow::milk()
 {
-	if (pGame->ItemCount >= 100) return;
 	Game::Item* item = new Game::Item();
 	item->pos.x = RefPoint.x + 20;
 	item->pos.y = RefPoint.y + 20;
 	item->type = "milk";
-	pGame->ItemList[pGame->ItemCount++] = item;
+	pGame->ItemList.push_back(item);
 }

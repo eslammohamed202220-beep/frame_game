@@ -29,18 +29,10 @@ void BudgetbarIcon::draw() const
 
 ChickIcon::ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
-	chickList = new Chick * [15];
-	for (int i = 0; i < 10; i++) {
-		chickList[i] = nullptr;
-	}
 }
 CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: BudgetbarIcon(r_pGame, r_point, r_width, r_height, img_path)
 {
-	cowList = new Cow * [15];
-	for (int i = 0; i < 10; i++) {
-		cowList[i] = nullptr;
-	}
 }
 void ChickIcon::onClick()
 {
@@ -62,13 +54,11 @@ void ChickIcon::onClick()
 		point p;
 	    p.x = range_min_x + rand() % (range_max_x - range_min_x);
         p.y = range_min_y + rand() % (range_max_y - range_min_y);
-		chickList[count]= new Chick(pGame, p, 50, 50, image_path);
-		chickList[count]->draw();
-		pGame->animalsList[pGame->animalCount] = chickList[count]; 
-		pGame->chickList[pGame->chickCount] = chickList[count];
-		pGame->animalCount++;
-		pGame->chickCount++;
-		count++;
+		Chick* newChick = new Chick(pGame, p, 50, 50, image_path);
+		chickList.push_back(newChick);
+		newChick->draw();
+		pGame->animalsList.push_back(newChick);
+		pGame->chickList.push_back(newChick);
 		//window* pWind = pGame->getWind();
 		//pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	}
@@ -91,13 +81,11 @@ void CowIcon::onClick()
 		p.x = range_min_x + rand() % (range_max_x - range_min_x);
 		p.y = range_min_y + rand() % (range_max_y - range_min_y);
 
-		cowList[count] = new Cow(pGame, p, 60, 60, image_path);
-		cowList[count]->draw();
-		pGame->animalsList[pGame->animalCount] = cowList[count];
-		pGame->cowList[pGame->cowCount] = cowList[count];
-		pGame->animalCount++;
-		pGame->cowCount++;
-		count++;
+		Cow* newCow = new Cow(pGame, p, 60, 60, image_path);
+		cowList.push_back(newCow);
+		newCow->draw();
+		pGame->animalsList.push_back(newCow);
+		pGame->cowList.push_back(newCow);
 	}
 }
 

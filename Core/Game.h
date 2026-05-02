@@ -4,6 +4,7 @@
 #include "../UI/BudgetBar.h"
 #include "../Entities/Animal.h"
 #include <ctime>
+#include <vector>
 
 class Game
 {
@@ -32,13 +33,10 @@ public:
 	// Public game data
 	int budget = 2000;
 
-	Animal* animalsList[100];
-	Chick* chickList[100];
-	Cow* cowList[100];
+	vector<Animal*> animalsList;
+	vector<Chick*> chickList;
+	vector<Cow*> cowList;
 
-	int animalCount = 0;
-	int chickCount = 0;
-	int cowCount = 0;
 	int eggInWareHouse = 0;
 	int milkInWareHouse = 0;
 	int randNum;
@@ -49,8 +47,7 @@ public:
 		bool active;
 		bool touched;
 	};
-	GreenArea greenAreas[50];
-	int greenAreaCount = 0;
+	vector<GreenArea*> greenAreaList;
 
 	// add egg and milk
 	struct Item
@@ -59,8 +56,7 @@ public:
 		string type;
 	};
 
-	Item* ItemList[100];
-	int ItemCount = 0;
+	vector<Item*> ItemList;
 	//for pause and resume 
 	bool isPaused = false;
 	// Constructors / Destructor

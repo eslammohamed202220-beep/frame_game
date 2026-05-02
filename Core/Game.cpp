@@ -1,4 +1,4 @@
-﻿#include "Game.h"
+#include "Game.h"
 #include "../Config/GameConfig.h"
 #include "../CMUgraphicsLib/error.h"
 #include <random>
@@ -32,17 +32,8 @@ Game::Game()
 {
 	// Initialization for logic
 	srand(time(0));
-	animalCount = 0;
 	budget = 1000;
 	wolf_Show = false;
-
-	for (int i = 0; i < 100; i++)
-	{
-		animalsList[i] = nullptr;
-		chickList[i] = nullptr;
-		cowList[i] = nullptr;
-		ItemList[i] = nullptr;
-	}
 	//1 - Create the main window
 	pWind = CreateWind(config.windWidth, config.windHeight, config.wx, config.wy);
 
@@ -85,12 +76,15 @@ Game::Game()
 Game::~Game()
 {
 	// Clean up all allocated memory to prevent leaks
-	for (int i = 0; i < animalCount; i++)
+	for (int i = 0; i < (int)animalsList.size(); i++)
 	{
 		if (animalsList[i]) delete animalsList[i];
 	}
-	for (int i = 0; i < ItemCount; i++) {
+	for (int i = 0; i < (int)ItemList.size(); i++) {
 		if (ItemList[i]) delete ItemList[i];
+	}
+	for (int i = 0; i < (int)greenAreaList.size(); i++) {
+		if (greenAreaList[i]) delete greenAreaList[i];
 	}
 	delete gameToolbar;
 	delete gameBudgetbar;
@@ -215,7 +209,7 @@ void Game::writeStatus() const
 
 	int y_pos = config.windHeight - config.statusBarHeight + 10;
 
-	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level) + " | Current animals number = " + to_string(animalCount);
+	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level) + " | Current animals number = " + to_string(animalsList.size());
 
 	pWind->DrawString(10, y_pos, timelevelmsg);
 }
@@ -239,8 +233,8 @@ void Game::animalCounter() const {
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(15, BOLD, BY_NAME, "Arial");
 	int y_pos = config.windHeight-490 ;
-	string chickDisplay = "  Chicken: " + to_string(chickCount);
-	string cowDisplay = "  Cow: " + to_string(cowCount);
+	string chickDisplay = "  Chicken: " + to_string(chickList.size());
+	string cowDisplay = "  Cow: " + to_string(cowList.size());
 	//string chickDisplay = "  Chicken: " + to_string(chickCount)
 
 	pWind->DrawString(5, y_pos, chickDisplay);
@@ -269,9 +263,6 @@ void Game::updateTimer()
 
 void Game::Wolfadd()
 {
-	if (animalCount >= 100)
-		return;
-
 	randNum = rand() % 100;
 	if (timer > 0 && randNum < 3 * level && !wolf_Show)
 	{
@@ -280,8 +271,7 @@ void Game::Wolfadd()
 		p.x = rand() % 1130;
 		p.y = 370 + rand() % 100;
 
-		animalsList[animalCount] = new Wolf(this, p, 70, 70, "images/wolff.jpg");
-		animalCount++;
+		animalsList.push_back(new Wolf(this, p, 70, 70, "images/wolff.jpg"));
 		wolf_Show = true;
 	}
 }
@@ -290,10 +280,9 @@ void Game::eggadd()
 {
 	if (timer > 0 && timer % 10 == 0 && !egg_show)
 	{
-		for (int i = 0; i < chickCount; i++)
+		for (int i = 0; i < (int)chickList.size(); i++)
 		{
-			if (chickList[i] != nullptr)
-				chickList[i]->egg();
+			chickList[i]->egg();
 		}
 		egg_show = true;
 	}
@@ -303,31 +292,28 @@ void Game::milkadd()
 {
 	if (timer > 0 && timer % 15 == 0 && !milk_show)
 	{
-		for (int i = 0; i < cowCount; i++)
+		for (int i = 0; i < (int)cowList.size(); i++)
 		{
-			if (cowList[i] != nullptr)
-				cowList[i]->milk();
+			cowList[i]->milk();
 		}
 		milk_show = true;
 	}
 }
 void Game::collectItems(int x, int y) {
-	for (int i = 0; i < ItemCount; i++) {
-		if (ItemList[i] != nullptr) {
-			if ((x >= ItemList[i]->pos.x && x <= ItemList[i]->pos.x + 30) &&
-				(y >= ItemList[i]->pos.y && y <= ItemList[i]->pos.y + 30)) {
-				if (ItemList[i]->type == "egg") {
-					eggInWareHouse++;
-					delete ItemList[i];
-					ItemList[i] = nullptr;
-					break;
-				}
-				else if (ItemList[i]->type == "milk") {
-					milkInWareHouse++;
-					delete ItemList[i];
-					ItemList[i] = nullptr;
-					break;
-				}
+	for (int i = 0; i < (int)ItemList.size(); i++) {
+		if ((x >= ItemList[i]->pos.x && x <= ItemList[i]->pos.x + 30) &&
+			(y >= ItemList[i]->pos.y && y <= ItemList[i]->pos.y + 30)) {
+			if (ItemList[i]->type == "egg") {
+				eggInWareHouse++;
+				delete ItemList[i];
+				ItemList.erase(ItemList.begin() + i);
+				break;
+			}
+			else if (ItemList[i]->type == "milk") {
+				milkInWareHouse++;
+				delete ItemList[i];
+				ItemList.erase(ItemList.begin() + i);
+				break;
 			}
 		}
 	}
@@ -335,28 +321,29 @@ void Game::collectItems(int x, int y) {
 void Game::restartGame()
 {
 
-	for (int i = 0; i < animalCount; i++)
+	for (int i = 0; i < (int)animalsList.size(); i++)
 	{
 		delete animalsList[i];
-		animalsList[i] = nullptr;
 	}
-	animalCount = 0;
-	chickCount = 0;
-	cowCount = 0;
+	animalsList.clear();
+	chickList.clear();
+	cowList.clear();
 	budget = 1000;
 	timer = 60 + (level - 1) * 30;
 	lasttime = time(0);
 
-	
-	greenAreaCount = 0;
+	for (int i = 0; i < (int)greenAreaList.size(); i++)
+	{
+		delete greenAreaList[i];
+	}
+	greenAreaList.clear();
 
 	
-	for (int i = 0; i < ItemCount; i++)
+	for (int i = 0; i < (int)ItemList.size(); i++)
 	{
 		delete ItemList[i];
-		ItemList[i] = nullptr;
 	}
-	ItemCount = 0;
+	ItemList.clear();
 
 	redrawScene();
 }
@@ -367,7 +354,6 @@ void Game::drawBackground() const
 	int playY = 2 * config.toolBarHeight;
 	int playH = config.windHeight - config.statusBarHeight - playY;
 
-	// Solid fallback if no JPEG can be loaded (wrong working directory, missing file, etc.)
 	pWind->SetPen(LAVENDER);
 	pWind->SetBrush(LAVENDER);
 	pWind->DrawRectangle(0, playY, config.windWidth, config.windHeight - config.statusBarHeight);
@@ -391,7 +377,6 @@ void Game::drawFieldBoundaries() const
 	int topY = 2 * config.toolBarHeight;
 	int bottomY = config.windHeight - config.statusBarHeight;
 
-	// CMUgraphics DrawRectangle defaults to FILLED; a filled rect would paint over the background image.
 	pWind->SetPen(DARKGREEN, 4);
 	pWind->DrawRectangle(0, topY, config.windWidth, bottomY, FRAME);
 }
@@ -405,14 +390,9 @@ void Game::drawWarehouse() const
 	int wy = playY + 20;
 
 	static const char* kWarehousePaths[] = {
-		"images/Warehouse.jpg",
-		"images\\Warehouse.jpg",
-		"../images/Warehouse.jpg",
-		"..\\images\\Warehouse.jpg",
-		
-
-
-	};
+    "images/Warehouse.jpg",
+    "../images/Warehouse.jpg"
+};
 
 	for (const char* path : kWarehousePaths)
 	{
@@ -436,8 +416,6 @@ void Game::drawFoodArea()const
 }
 void Game::drawGreenArea()
 {
-	if (greenAreaCount >= 50) return;
-
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
 	int foodW = 1200;
@@ -445,18 +423,19 @@ void Game::drawGreenArea()
 	int areaW = 50;
 	int areaH = 40;
 
-	greenAreas[greenAreaCount].x = foodX + rand() % (foodW - areaW);
-	greenAreas[greenAreaCount].y = foodY + rand() % (foodH - areaH);
-	greenAreas[greenAreaCount].counter = 29;
-	greenAreas[greenAreaCount].active = true;
-	greenAreas[greenAreaCount].touched = false;
-	greenAreaCount++;
+	GreenArea* newArea = new GreenArea();
+	newArea->x = foodX + rand() % (foodW - areaW);
+	newArea->y = foodY + rand() % (foodH - areaH);
+	newArea->counter = 29;
+	newArea->active = true;
+	newArea->touched = false;
+	greenAreaList.push_back(newArea);
 }
 void Game::checkAnimalGrassCollision()
 {
-	for (int i = 0; i < greenAreaCount; i++)
+	for (int i = 0; i < (int)greenAreaList.size(); i++)
 	{
-		if (!greenAreas[i].active)
+		if (!greenAreaList[i]->active)
 			continue;
 
 		bool touchingNow = false;
@@ -465,11 +444,8 @@ void Game::checkAnimalGrassCollision()
 		int grassH = 40;
 
 		
-		for (int j = 0; j < chickCount; j++)
+		for (int j = 0; j < (int)chickList.size(); j++)
 		{
-			if (chickList[j] == nullptr)
-				continue;
-
 			point animalPos = chickList[j]->getPosition();
 
 			int animalX = animalPos.x;
@@ -478,21 +454,18 @@ void Game::checkAnimalGrassCollision()
 			int animalW = 60;
 			int animalH = 60;
 
-			if (animalX < greenAreas[i].x + grassW &&
-				animalX + animalW > greenAreas[i].x &&
-				animalY < greenAreas[i].y + grassH &&
-				animalY + animalH > greenAreas[i].y)
+			if (animalX < greenAreaList[i]->x + grassW &&
+				animalX + animalW > greenAreaList[i]->x &&
+				animalY < greenAreaList[i]->y + grassH &&
+				animalY + animalH > greenAreaList[i]->y)
 			{
 				touchingNow = true;
 				break;
 			}
 		}
 
-		for (int j = 0; j < cowCount; j++)
+		for (int j = 0; j < (int)cowList.size(); j++)
 		{
-			if (cowList[j] == nullptr)
-				continue;
-
 			point animalPos = cowList[j]->getPosition();
 
 			int animalX = animalPos.x;
@@ -501,10 +474,10 @@ void Game::checkAnimalGrassCollision()
 			int animalW = 60;
 			int animalH = 60;
 
-			if (animalX < greenAreas[i].x + grassW &&
-				animalX + animalW > greenAreas[i].x &&
-				animalY < greenAreas[i].y + grassH &&
-				animalY + animalH > greenAreas[i].y)
+			if (animalX < greenAreaList[i]->x + grassW &&
+				animalX + animalW > greenAreaList[i]->x &&
+				animalY < greenAreaList[i]->y + grassH &&
+				animalY + animalH > greenAreaList[i]->y)
 			{
 				touchingNow = true;
 				break;
@@ -513,11 +486,11 @@ void Game::checkAnimalGrassCollision()
 
 		if (touchingNow)
 		{
-			greenAreas[i].counter--;
+			greenAreaList[i]->counter--;
 
-			if (greenAreas[i].counter <= 0)
+			if (greenAreaList[i]->counter <= 0)
 			{
-				greenAreas[i].active = false;
+				greenAreaList[i]->active = false;
 			}
 		}
 	}
@@ -530,34 +503,30 @@ void Game::redrawScene() const
 	drawFoodArea();
 	warehouseContent();
 	animalCounter();
-	for (int i = 0; i < animalCount; i++)
+	for (int i = 0; i < (int)animalsList.size(); i++)
 	{
-		if (animalsList[i] != nullptr)
-			animalsList[i]->draw();
+		animalsList[i]->draw();
 	}
-	for (int i = 0; i < ItemCount; i++)
+	for (int i = 0; i < (int)ItemList.size(); i++)
 	{
-		if (ItemList[i] != nullptr)
-		{
-			if (ItemList[i]->type == "egg")
-				pWind->DrawImage("images\\egg.jpg", ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
-			else if (ItemList[i]->type == "milk")
-				pWind->DrawImage("images\\milk.jpg", ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
-		}
+		if (ItemList[i]->type == "egg")
+			pWind->DrawImage("images\\egg.jpg", ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
+		else if (ItemList[i]->type == "milk")
+			pWind->DrawImage("images\\milk.jpg", ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
 	}
-	for (int i = 0; i < greenAreaCount; i++)
+	for (int i = 0; i < (int)greenAreaList.size(); i++)
 	{
-		if (!greenAreas[i].active) continue;
+		if (!greenAreaList[i]->active) continue;
 
 		pWind->SetPen(DARKGREEN, 2);
 		pWind->SetBrush(GREEN);
-		pWind->DrawRectangle(greenAreas[i].x, greenAreas[i].y,
-			greenAreas[i].x + 50, greenAreas[i].y + 40, FILLED);
+		pWind->DrawRectangle(greenAreaList[i]->x, greenAreaList[i]->y,
+			greenAreaList[i]->x + 50, greenAreaList[i]->y + 40, FILLED);
 
 		pWind->SetPen(BLACK, 1);
 		pWind->SetFont(16, BOLD, BY_NAME, "Arial");
-		pWind->DrawString(greenAreas[i].x + 15, greenAreas[i].y - 18,
-			to_string(greenAreas[i].counter));
+		pWind->DrawString(greenAreaList[i]->x + 15, greenAreaList[i]->y - 18,
+			to_string(greenAreaList[i]->counter));
 	}
 
 	gameToolbar->draw();
@@ -584,10 +553,9 @@ void Game::go()
 		{
 			updateTimer();
 
-			for (int i = 0; i < animalCount; i++)
+			for (int i = 0; i < (int)animalsList.size(); i++)
 			{
-				if (animalsList[i] != nullptr)
-					animalsList[i]->moveStep();
+				animalsList[i]->moveStep();
 			}
 
 			Wolfadd();

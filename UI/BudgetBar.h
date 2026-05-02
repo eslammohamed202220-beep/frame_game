@@ -4,6 +4,7 @@
 #include "../Config/GameConfig.h"
 #include <random>
 #include <limits>
+#include <vector>
 
 //Ranges for generating a random location for the animals
 const int range_min_x = 0;
@@ -26,16 +27,14 @@ public:
 class ChickIcon : public BudgetbarIcon
 {
 public:
-	Chick** chickList; //an array of Chick pointers
-	int count = 0;
+	vector<Chick*> chickList;
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 };
 class CowIcon : public BudgetbarIcon
 {
 public:
-	Cow** cowList;
-	int count = 0;
+	vector<Cow*> cowList;
 
 	CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
