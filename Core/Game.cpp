@@ -5,6 +5,7 @@
 #include"../UI/BudgetBar.h"
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 using namespace std;
 namespace {
 
@@ -66,6 +67,7 @@ Game::Game()
 	level = 1;
 	timer = 60 + (level - 1) * 30;
 	lasttime = time(0);
+	lastWolfSpawnTime = time(0);
 
 	printBudget("BUDGET = $" + to_string(budget));
 	writeStatus();
@@ -235,10 +237,11 @@ void Game::animalCounter() const {
 	int y_pos = config.windHeight-490 ;
 	string chickDisplay = "  Chicken: " + to_string(chickList.size());
 	string cowDisplay = "  Cow: " + to_string(cowList.size());
-	//string chickDisplay = "  Chicken: " + to_string(chickCount)
+	string consumedDisplay = "  Fed: " + to_string(totalFoodConsumed);
 
 	pWind->DrawString(5, y_pos, chickDisplay);
 	pWind->DrawString(90, y_pos, cowDisplay);
+	pWind->DrawString(160, y_pos, consumedDisplay);
 }
 // ==========================
 // Game Logic
@@ -263,8 +266,21 @@ void Game::updateTimer()
 
 void Game::Wolfadd()
 {
+	time_t now = time(0);
+	int spawnCooldown = max(6, 12 - level);
 	randNum = rand() % 100;
-	if (timer > 0 && randNum < 3 * level && !wolf_Show)
+	int activeWolves = 0;
+	for (int i = 0; i < (int)animalsList.size(); i++)
+	{
+		if (dynamic_cast<Wolf*>(animalsList[i]) != nullptr)
+			activeWolves++;
+	}
+
+	if (timer > 0 &&
+		(now - lastWolfSpawnTime) >= spawnCooldown &&
+		randNum < (2 + level) &&
+		activeWolves < 2 &&
+		!wolf_Show)
 	{
 		point p;
 
@@ -272,6 +288,7 @@ void Game::Wolfadd()
 		p.y = 370 + rand() % 100;
 
 		animalsList.push_back(new Wolf(this, p, 70, 70, "images/wolff.jpg"));
+		lastWolfSpawnTime = now;
 		wolf_Show = true;
 	}
 }
@@ -329,8 +346,10 @@ void Game::restartGame()
 	chickList.clear();
 	cowList.clear();
 	budget = 1000;
+	totalFoodConsumed = 0;
 	timer = 60 + (level - 1) * 30;
 	lasttime = time(0);
+	lastWolfSpawnTime = time(0);
 
 	for (int i = 0; i < (int)greenAreaList.size(); i++)
 	{
@@ -390,9 +409,9 @@ void Game::drawWarehouse() const
 	int wy = playY + 20;
 
 	static const char* kWarehousePaths[] = {
-    "images/Warehouse.jpg",
-    "../images/Warehouse.jpg"
-};
+		"images/Warehouse.jpg",
+		"../images/Warehouse.jpg"
+	};
 
 	for (const char* path : kWarehousePaths)
 	{
@@ -439,6 +458,7 @@ void Game::checkAnimalGrassCollision()
 			continue;
 
 		bool touchingNow = false;
+		Animal* eater = nullptr;
 
 		int grassW = 50;
 		int grassH = 40;
@@ -460,11 +480,12 @@ void Game::checkAnimalGrassCollision()
 				animalY + animalH > greenAreaList[i]->y)
 			{
 				touchingNow = true;
+				eater = chickList[j];
 				break;
 			}
 		}
 
-		for (int j = 0; j < (int)cowList.size(); j++)
+		for (int j = 0; j < (int)cowList.size() && !touchingNow; j++)
 		{
 			point animalPos = cowList[j]->getPosition();
 
@@ -480,20 +501,58 @@ void Game::checkAnimalGrassCollision()
 				animalY + animalH > greenAreaList[i]->y)
 			{
 				touchingNow = true;
+				eater = cowList[j];
 				break;
 			}
 		}
 
 		if (touchingNow)
 		{
-			greenAreaList[i]->counter--;
-
-			if (greenAreaList[i]->counter <= 0)
+			if (!greenAreaList[i]->touched)
 			{
-				greenAreaList[i]->active = false;
+				greenAreaList[i]->counter--;
+				totalFoodConsumed++;
+				if (eater != nullptr) eater->hunger = 0;
+
+				if (greenAreaList[i]->counter <= 0)
+				{
+					greenAreaList[i]->active = false;
+				}
+				greenAreaList[i]->touched = true;
 			}
 		}
+		else
+		{
+			greenAreaList[i]->touched = false;
+		}
 	}
+}
+bool Game::isWarehouseClicked(int x, int y) const
+{
+	int playY = 2 * config.toolBarHeight;
+	const int warehouseW = 220;
+	const int warehouseH = 180;
+	int wx = config.windWidth - warehouseW - 30;
+	int wy = playY + 20;
+	return x >= wx && x <= wx + warehouseW && y >= wy && y <= wy + warehouseH;
+}
+
+void Game::openWarehouseWindow() const
+{
+	window infoWin(420, 240, config.wx + 80, config.wy + 80);
+	infoWin.SetPen(BLACK, 2);
+	infoWin.SetBrush(WHITE);
+	infoWin.DrawRectangle(0, 0, 420, 240, FILLED);
+	infoWin.SetFont(22, BOLD, BY_NAME, "Arial");
+	infoWin.DrawString(95, 20, "Warehouse Inventory");
+	infoWin.SetFont(18, BOLD, BY_NAME, "Arial");
+	infoWin.DrawString(40, 80, "Eggs  : " + to_string(eggInWareHouse));
+	infoWin.DrawString(40, 120, "Milk  : " + to_string(milkInWareHouse));
+	infoWin.DrawString(40, 160, "Fed Animals: " + to_string(totalFoodConsumed));
+	infoWin.SetFont(14, BOLD, BY_NAME, "Arial");
+	infoWin.DrawString(40, 205, "Click anywhere in this window to close");
+	int x, y;
+	infoWin.WaitMouseClick(x, y);
 }
 void Game::redrawScene() const
 {
@@ -583,6 +642,10 @@ void Game::go()
 			else
 			{
 				collectItems(x, y);
+				if (isWarehouseClicked(x, y))
+				{
+					openWarehouseWindow();
+				}
 
 				if (y >= 0 && y < config.toolBarHeight)
 				{

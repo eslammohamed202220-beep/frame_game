@@ -44,8 +44,7 @@ void ChickIcon::onClick()
 	*/
 	
 	//Chick* new_chick = new Chick(pGame, RefPoint, 30, 30, "images\\Chick.png");
-	cout << "Icon Chick Clicked" << endl;
-	if (pGame->budget > 100) {
+	if (pGame->budget >= 100) {
 		pGame->budget = pGame->budget - 100;
 		pGame->clearBudget();
 		string budget_string = "BUDGET = $" + to_string(pGame->budget);
@@ -66,9 +65,7 @@ void ChickIcon::onClick()
 
 void CowIcon::onClick()
 {
-	cout << "Icon Cow Clicked" << endl;
-
-	if (pGame->budget > 300 )
+	if (pGame->budget >= 300 )
 	{
 		pGame->budget = pGame->budget - 300;
 
@@ -119,9 +116,9 @@ Budgetbar::Budgetbar(Game* r_pGame, point r_point, int r_width, int r_height) : 
 
 Budgetbar::~Budgetbar()
 {
-	for (int i = 0; i < ICON_COUNT; i++)
+	for (int i = 0; i < ANIMAL_COUNT; i++)
 		delete iconsList[i];
-	delete iconsList;
+	delete[] iconsList;
 }
 
 void Budgetbar::draw() const
@@ -159,8 +156,6 @@ WaterIcon::WaterIcon(Game* r_pGame, point r_point, int r_width, int r_height, st
 
 void WaterIcon::onClick()
 {
-	cout << "Icon Water Clicked" << endl;
-
 	if (pGame->budget >= 50)
 	{
 		pGame->budget -= 50;

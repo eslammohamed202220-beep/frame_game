@@ -21,6 +21,7 @@ private:
 	// Time handling
 	time_t lasttime = time(0);
 	time_t currenttime;
+	time_t lastWolfSpawnTime = 0;
 
 	// Display flags
 	bool wolf_Show = false;
@@ -39,6 +40,7 @@ public:
 
 	int eggInWareHouse = 0;
 	int milkInWareHouse = 0;
+	int totalFoodConsumed = 0;
 	int randNum;
 	// add green area
 	struct GreenArea {
@@ -88,6 +90,8 @@ public:
 	void redrawScene() const;
 	void drawFoodArea()const;
 	void drawGreenArea();
+	bool isWarehouseClicked(int x, int y) const;
+	void openWarehouseWindow() const;
 
 	// Game logic
 	void updateTimer();
