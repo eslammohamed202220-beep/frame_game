@@ -32,6 +32,7 @@ private:
 public:
 	int numchick = 0;
 	int numcow = 0;
+
 	// Public game data
 	int budget = 2000;
 
@@ -92,7 +93,8 @@ public:
 	void drawFoodArea()const;
 	void drawGreenArea();
 	bool isWarehouseClicked(int x, int y) const;
-	void openWarehouseWindow() const;
+	void openWarehouseWindow();
+	void drawWarehouseUI(window& infoWin);
 
 	// Game logic
 	void updateTimer();
@@ -102,6 +104,8 @@ public:
 	void milkadd();
 	void collectItems(int x, int y);
 	void restartGame();
+	void sellegg();
+	void sellmilk();
 
 	// Main loop
 	void go();

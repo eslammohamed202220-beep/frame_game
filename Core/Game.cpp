@@ -335,6 +335,14 @@ void Game::collectItems(int x, int y) {
 		}
 	}
 }
+void Game::sellegg() {
+		eggInWareHouse--;
+		budget += 100;
+}
+void Game::sellmilk() {
+		milkInWareHouse--;
+		budget += 200;
+}
 void Game::restartGame()
 {
 
@@ -537,22 +545,132 @@ bool Game::isWarehouseClicked(int x, int y) const
 	return x >= wx && x <= wx + warehouseW && y >= wy && y <= wy + warehouseH;
 }
 
-void Game::openWarehouseWindow() const
+void Game::drawWarehouseUI(window& infoWin)
 {
-	window infoWin(420, 240, config.wx + 80, config.wy + 80);
-	infoWin.SetPen(BLACK, 2);
-	infoWin.SetBrush(WHITE);
-	infoWin.DrawRectangle(0, 0, 420, 240, FILLED);
-	infoWin.SetFont(22, BOLD, BY_NAME, "Arial");
-	infoWin.DrawString(95, 20, "Warehouse Inventory");
+	image bg("../images/best-shop.jpg");
+	infoWin.DrawImage(bg, 0, 0, 960, 540);
+
+	image egg("../images/egg.jpg");
+	infoWin.DrawImage(egg, 205, 160, 90, 90);
+
+	image milk("../images/milk.jpg");
+	infoWin.DrawImage(milk, 320, 157, 90, 90);
+
+	infoWin.SetPen(BLACK, 3);
 	infoWin.SetFont(18, BOLD, BY_NAME, "Arial");
-	infoWin.DrawString(40, 80, "Eggs  : " + to_string(eggInWareHouse));
-	infoWin.DrawString(40, 120, "Milk  : " + to_string(milkInWareHouse));
-	infoWin.DrawString(40, 160, "Fed Animals: " + to_string(totalFoodConsumed));
-	infoWin.SetFont(14, BOLD, BY_NAME, "Arial");
-	infoWin.DrawString(40, 205, "Click anywhere in this window to close");
-	int x, y;
-	infoWin.WaitMouseClick(x, y);
+
+	string eggText = "Egg: " + to_string(eggInWareHouse);
+	infoWin.DrawString(200, 260, eggText.c_str());
+
+	string milkText = "Milk: " + to_string(milkInWareHouse);
+	infoWin.DrawString(330, 260, milkText.c_str());
+}
+
+void Game::openWarehouseWindow()
+{
+    
+    const int winW = 960;
+    const int winH = 540;
+
+    int winX = config.wx + (config.windWidth - winW) / 2;
+    int winY = config.wy + (config.windHeight - winH) / 2;
+
+    window infoWin(winW, winH, winX, winY);
+
+    
+    infoWin.SetBuffering(true);
+
+    
+    const int BOX_W = 180;
+    const int BOX_H = 90;
+
+    const int ICON_W = 90;
+    const int ICON_H = 90;
+
+   
+    const int EGG_BOX_X = 160;
+    const int EGG_BOX_Y = 160;
+    const int EGG_X = EGG_BOX_X + (BOX_W - ICON_W) / 2; 
+    const int EGG_Y = EGG_BOX_Y;                        
+
+    const int MILK_BOX_X = 300;
+    const int MILK_BOX_Y = 160;
+    const int MILK_X = MILK_BOX_X + (BOX_W - ICON_W) / 2; 
+    const int MILK_Y = MILK_BOX_Y;                        
+
+    
+    const int EXIT_X = 720;
+    const int EXIT_Y = 40;
+    const int EXIT_W = 60;
+    const int EXIT_H = 60;
+
+    int x, y;
+
+    
+    while (true)
+    {
+       
+        try
+        {
+            image bg("../images/best-shop.jpg");
+            infoWin.DrawImage(bg, 0, 0, winW, winH);
+        }
+        catch (error)
+        {
+            infoWin.SetBrush(WHITE);
+            infoWin.DrawRectangle(0, 0, winW, winH, FILLED);
+        }
+
+        // Icons
+        try
+        {
+            image eggImg("../images/egg.jpg");
+            infoWin.DrawImage(eggImg, EGG_X, EGG_Y, ICON_W, ICON_H);
+
+            image milkImg("../images/milk.jpg");
+            infoWin.DrawImage(milkImg, MILK_X, MILK_Y, ICON_W, ICON_H);
+        }
+        catch (error) {}
+
+        // Text
+		infoWin.SetPen(config.penColor, 50);
+		infoWin.SetFont(15, BOLD, BY_NAME, "Arial");
+
+		string egg = "Egg: " + to_string(eggInWareHouse);
+		infoWin.DrawString(200, 260, egg);
+		string eggprice = "price: " + to_string(100);
+		infoWin.DrawString(250, 260, eggprice);
+
+		string milk = "Milk: " + to_string(milkInWareHouse);
+		infoWin.DrawString(320 - 3, 260, milk);
+		string milkprice = "price: " + to_string(200);
+		infoWin.DrawString(370 - 3, 260, milkprice);
+
+        infoWin.UpdateBuffer();
+        infoWin.WaitMouseClick(x, y);
+
+        if (x >= EXIT_X && x <= EXIT_X + EXIT_W &&
+            y >= EXIT_Y && y <= EXIT_Y + EXIT_H)
+        {
+            break;
+        }
+
+        // Sell Egg
+        if (x >= EGG_X && x <= EGG_X + ICON_W &&
+            y >= EGG_Y && y <= EGG_Y + ICON_H &&
+            eggInWareHouse > 0)
+        {
+			sellegg();
+        }
+
+     
+        if (x >= MILK_X && x <= MILK_X + ICON_W &&
+            y >= MILK_Y && y <= MILK_Y + ICON_H &&
+            milkInWareHouse > 0)
+        {
+			sellmilk();
+        }
+    }
 }
 void Game::redrawScene() const
 {
@@ -642,6 +760,7 @@ void Game::go()
 				if (isWarehouseClicked(x, y))
 				{
 					openWarehouseWindow();
+				
 				}
 
 				if (y >= 0 && y < config.toolBarHeight)
