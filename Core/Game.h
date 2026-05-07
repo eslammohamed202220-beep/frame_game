@@ -29,8 +29,9 @@ private:
 	bool milk_show = false;
 	// Water area state
 
-
 public:
+	int numchick = 0;
+	int numcow = 0;
 	// Public game data
 	int budget = 2000;
 

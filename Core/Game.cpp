@@ -232,16 +232,16 @@ void Game::warehouseContent() const {
 	pWind->DrawString(985, y_pos_milk, milk);
 }
 void Game::animalCounter() const {
-	pWind->SetPen(config.penColor, 50);
-	pWind->SetFont(15, BOLD, BY_NAME, "Arial");
-	int y_pos = config.windHeight-490 ;
-	string chickDisplay = "  Chicken: " + to_string(chickList.size());
-	string cowDisplay = "  Cow: " + to_string(cowList.size());
-	string consumedDisplay = "  Fed: " + to_string(totalFoodConsumed);
+	for (int i = 0; i < (int)animalsList.size(); i++)
+	{
+		Animal* animal = animalsList[i];
+		point p = animal->getPosition();
+		animalsList[i]->draw();
 
-	pWind->DrawString(5, y_pos, chickDisplay);
-	pWind->DrawString(90, y_pos, cowDisplay);
-	pWind->DrawString(160, y_pos, consumedDisplay);
+		pWind->SetPen(RED, 2);
+		pWind->SetFont(14, BOLD, BY_NAME, "Arial");
+		pWind->DrawString(p.x + 25, p.y - 25, to_string(i + 1));
+	}
 }
 // ==========================
 // Game Logic
@@ -562,10 +562,7 @@ void Game::redrawScene() const
 	drawFoodArea();
 	warehouseContent();
 	animalCounter();
-	for (int i = 0; i < (int)animalsList.size(); i++)
-	{
-		animalsList[i]->draw();
-	}
+	
 	for (int i = 0; i < (int)ItemList.size(); i++)
 	{
 		if (ItemList[i]->type == "egg")

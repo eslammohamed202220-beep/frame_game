@@ -36,6 +36,8 @@ CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string
 }
 void ChickIcon::onClick()
 {
+	
+	window* pWind = pGame->getWind();
 	//TO DO: add code for cleanup and game exit here
 	/*
 	//draw image of this object in the field
@@ -54,6 +56,10 @@ void ChickIcon::onClick()
 	    p.x = range_min_x + rand() % (range_max_x - range_min_x);
         p.y = range_min_y + rand() % (range_max_y - range_min_y);
 		Chick* newChick = new Chick(pGame, p, 50, 50, image_path);
+		pWind->SetPen(config.penColor, 50);
+		pWind->SetFont(20, BOLD, BY_NAME, "Arial");
+		pWind->DrawString(p.x + 250, p.y - 100, to_string(pGame->numchick));
+		//numchick++;
 		chickList.push_back(newChick);
 		newChick->draw();
 		pGame->animalsList.push_back(newChick);

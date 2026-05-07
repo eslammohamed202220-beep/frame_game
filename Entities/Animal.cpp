@@ -33,6 +33,7 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 	curr_pos = r_point;
 	curr_vel.x = 1;
 	curr_vel.y = 1;
+	
 }
 
 void Animal::draw() const
@@ -112,7 +113,7 @@ Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img
 
 void Chick::moveStep()
 {
-	// Keep original random style, but with smaller steps for smoother movement.
+
 	if ((rand() % 4) != 0) return;
 
 	int dx = (rand() % 3) - 1;
@@ -128,7 +129,6 @@ void Chick::moveStep()
 	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
 	if (newY < foodY) newY = foodY;
 	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
-
 	RefPoint.x = newX;
 	RefPoint.y = newY;
 }
@@ -139,6 +139,7 @@ Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_pat
 
 void Cow::moveStep()
 {
+	//window* pWind = pGame->getWind();
 	if ((rand() % 8) != 0) return;
 
 	int dx = (rand() % 3) - 1;
@@ -154,9 +155,9 @@ void Cow::moveStep()
 	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
 	if (newY < foodY) newY = foodY;
 	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
-
 	RefPoint.x = newX;
 	RefPoint.y = newY;
+
 }
 
 Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)

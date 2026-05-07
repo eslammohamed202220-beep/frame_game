@@ -12,6 +12,7 @@ const int range_max_x = 1200 - 60;
 const int range_min_y = config.windHeight - config.statusBarHeight - 180;
 const int range_max_y = config.windHeight - config.statusBarHeight - 180 + 170 - 60;
 
+
 //Base class for all toolbar icons 
 class BudgetbarIcon :public Drawable
 {
