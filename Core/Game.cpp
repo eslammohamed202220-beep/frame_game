@@ -224,11 +224,11 @@ void Game::warehouseContent() const {
 	pWind->DrawString(985, (y_pos_Structure), wareHouseStructure);
 
 	int y_pos_egg = config.windHeight -370;
-	string egg = "  Egg:   |      " + to_string(eggInWareHouse) + "     |   10 ";
+	string egg = "  Egg:   |      " + to_string(eggInWareHouse) + "     |   100 ";
 	pWind->DrawString(985, y_pos_egg, egg);
 
 	int y_pos_milk = config.windHeight -350;
-	string milk = "  Milk:  |      " + to_string(milkInWareHouse) + "      |   20 ";
+	string milk = "  Milk:  |      " + to_string(milkInWareHouse) + "      |   200 ";
 	pWind->DrawString(985, y_pos_milk, milk);
 }
 void Game::animalCounter() const {
@@ -622,16 +622,24 @@ void Game::openWarehouseWindow()
         }
 
         // Icons
+		if (eggInWareHouse > 0) {
+
         try
         {
             image eggImg("../images/egg.jpg");
             infoWin.DrawImage(eggImg, EGG_X, EGG_Y, ICON_W, ICON_H);
-
-            image milkImg("../images/milk.jpg");
-            infoWin.DrawImage(milkImg, MILK_X, MILK_Y, ICON_W, ICON_H);
         }
         catch (error) {}
+		}
+		if (milkInWareHouse > 0) {
+			try
+			{
 
+				image milkImg("../images/milk.jpg");
+				infoWin.DrawImage(milkImg, MILK_X, MILK_Y, ICON_W, ICON_H);
+			}
+			catch (error) {}
+		}
         // Text
 		infoWin.SetPen(config.penColor, 50);
 		infoWin.SetFont(15, BOLD, BY_NAME, "Arial");
