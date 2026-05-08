@@ -620,39 +620,39 @@ void Game::openWarehouseWindow()
             infoWin.SetBrush(WHITE);
             infoWin.DrawRectangle(0, 0, winW, winH, FILLED);
         }
-
-        // Icons
-		if (eggInWareHouse > 0) {
-
-        try
-        {
-            image eggImg("../images/egg.jpg");
-            infoWin.DrawImage(eggImg, EGG_X, EGG_Y, ICON_W, ICON_H);
-        }
-        catch (error) {}
-		}
-		if (milkInWareHouse > 0) {
-			try
-			{
-
-				image milkImg("../images/milk.jpg");
-				infoWin.DrawImage(milkImg, MILK_X, MILK_Y, ICON_W, ICON_H);
-			}
-			catch (error) {}
-		}
-        // Text
 		infoWin.SetPen(config.penColor, 50);
 		infoWin.SetFont(15, BOLD, BY_NAME, "Arial");
 
-		string egg = "Egg: " + to_string(eggInWareHouse);
-		infoWin.DrawString(200, 260, egg);
-		string eggprice = "price: " + to_string(100);
-		infoWin.DrawString(250, 260, eggprice);
+        
+			if (eggInWareHouse > 0) {
 
-		string milk = "Milk: " + to_string(milkInWareHouse);
-		infoWin.DrawString(320 - 3, 260, milk);
-		string milkprice = "price: " + to_string(200);
-		infoWin.DrawString(370 - 3, 260, milkprice);
+				try
+				{
+					image eggImg("../images/egg.jpg");
+					infoWin.DrawImage(eggImg, EGG_X, EGG_Y, ICON_W, ICON_H);
+					string egg = "Egg: " + to_string(eggInWareHouse);
+					infoWin.DrawString(200, 260, egg);
+					string eggprice = "price: " + to_string(100);
+					infoWin.DrawString(250, 260, eggprice);
+				}
+        catch (error) {}
+		}
+			if (milkInWareHouse > 0) {
+				try
+				{
+
+					image milkImg("../images/milk.jpg");
+					infoWin.DrawImage(milkImg, MILK_X, MILK_Y, ICON_W, ICON_H);
+					string milk = "Milk: " + to_string(milkInWareHouse);
+					infoWin.DrawString(320 - 3, 260, milk);
+					string milkprice = "price: " + to_string(200);
+					infoWin.DrawString(370 - 3, 260, milkprice);
+				}
+				catch (error) {}
+		}
+        // Text
+
+
 
         infoWin.UpdateBuffer();
         infoWin.WaitMouseClick(x, y);
