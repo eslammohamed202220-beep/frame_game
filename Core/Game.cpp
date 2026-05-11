@@ -23,6 +23,30 @@ namespace {
 		}
 	}
 
+	bool tryDrawJpeg(window& w, const char* path, int x, int y, int iw, int ih)
+	{
+		try
+		{
+			image img(path);
+			w.DrawImage(img, x, y, iw, ih);
+			return true;
+		}
+		catch (error)
+		{
+			return false;
+		}
+	}
+
+	bool drawFirstMatch(window& w, const char* const* paths, size_t nPaths, int x, int y, int iw, int ih)
+	{
+		for (size_t i = 0; i < nPaths; ++i)
+		{
+			if (tryDrawJpeg(w, paths[i], x, y, iw, ih))
+				return true;
+		}
+		return false;
+	}
+
 } // namespace
 
 // ==========================
@@ -566,120 +590,111 @@ void Game::drawWarehouseUI(window& infoWin)
 	infoWin.DrawString(330, 260, milkText.c_str());
 }
 
-//fuck you abdallah
 void Game::openWarehouseWindow()
 {
-    
-    const int winW = 960;
-    const int winH = 540;
+	static const char* kShopBg[] = {
+		"images/best-shop.jpg",
+		"../images/best-shop.jpg",
+		"images\\best-shop.jpg",
+		"..\\images\\best-shop.jpg",
+	};
+	static const char* kEggImg[] = {
+		"images/egg.jpg",
+		"../images/egg.jpg",
+		"images\\egg.jpg",
+		"..\\images\\egg.jpg",
+	};
+	static const char* kMilkImg[] = {
+		"images/milk.jpg",
+		"../images/milk.jpg",
+		"images\\milk.jpg",
+		"..\\images\\milk.jpg",
+	};
 
-    int winX = config.wx + (config.windWidth - winW) / 2;
-    int winY = config.wy + (config.windHeight - winH) / 2;
+	const int winW = 960;
+	const int winH = 540;
 
-    window infoWin(winW, winH, winX, winY);
+	int winX = config.wx + (config.windWidth - winW) / 2;
+	int winY = config.wy + (config.windHeight - winH) / 2;
 
-    
-    infoWin.SetBuffering(true);
+	window infoWin(winW, winH, winX, winY);
 
-    
-    const int BOX_W = 180;
-    const int BOX_H = 90;
+	// Do not use SetBuffering on a second CMUgraphics window: tearing it down while a
+	// bitmap is still selected into the off-screen DC can destabilize GDI / the process.
 
-    const int ICON_W = 90;
-    const int ICON_H = 90;
+	const int BOX_W = 180;
+	const int ICON_W = 90;
+	const int ICON_H = 90;
 
-   
-    const int EGG_BOX_X = 160;
-    const int EGG_BOX_Y = 160;
-    const int EGG_X = EGG_BOX_X + (BOX_W - ICON_W) / 2; 
-    const int EGG_Y = EGG_BOX_Y;                        
+	const int EGG_BOX_X = 160;
+	const int EGG_BOX_Y = 160;
+	const int EGG_X = EGG_BOX_X + (BOX_W - ICON_W) / 2;
+	const int EGG_Y = EGG_BOX_Y;
 
-    const int MILK_BOX_X = 300;
-    const int MILK_BOX_Y = 160;
-    const int MILK_X = MILK_BOX_X + (BOX_W - ICON_W) / 2; 
-    const int MILK_Y = MILK_BOX_Y;                        
+	const int MILK_BOX_X = 300;
+	const int MILK_BOX_Y = 160;
+	const int MILK_X = MILK_BOX_X + (BOX_W - ICON_W) / 2;
+	const int MILK_Y = MILK_BOX_Y;
 
-    
-    const int EXIT_X = 720;
-    const int EXIT_Y = 40;
-    const int EXIT_W = 60;
-    const int EXIT_H = 60;
+	const int EXIT_X = 720;
+	const int EXIT_Y = 40;
+	const int EXIT_W = 60;
+	const int EXIT_H = 60;
 
-    int x, y;
+	int x, y;
 
-    
-    while (true)
-    {
-       
-        try
-        {
-            image bg("../images/best-shop.jpg");
-            infoWin.DrawImage(bg, 0, 0, winW, winH);
-        }
-        catch (error)
-        {
-            infoWin.SetBrush(WHITE);
-            infoWin.DrawRectangle(0, 0, winW, winH, FILLED);
-        }
+	while (true)
+	{
+		if (!drawFirstMatch(infoWin, kShopBg, sizeof(kShopBg) / sizeof(kShopBg[0]), 0, 0, winW, winH))
+		{
+			infoWin.SetBrush(WHITE);
+			infoWin.SetPen(BLACK, 1);
+			infoWin.DrawRectangle(0, 0, winW, winH, FILLED);
+		}
+
+		infoWin.SetPen(BLACK, 2);
+		infoWin.SetBrush(LIGHTGRAY);
+		infoWin.DrawRectangle(EXIT_X, EXIT_Y, EXIT_X + EXIT_W, EXIT_Y + EXIT_H, FILLED);
+		infoWin.SetPen(config.penColor, 2);
+		infoWin.SetFont(14, BOLD, BY_NAME, "Arial");
+		infoWin.DrawString(EXIT_X + 8, EXIT_Y + 20, "EXIT");
+
 		infoWin.SetPen(config.penColor, 50);
 		infoWin.SetFont(15, BOLD, BY_NAME, "Arial");
 
-        
-			if (eggInWareHouse > 0) {
-
-				try
-				{
-					image eggImg("../images/egg.jpg");
-					infoWin.DrawImage(eggImg, EGG_X, EGG_Y, ICON_W, ICON_H);
-					string egg = "Egg: " + to_string(eggInWareHouse);
-					infoWin.DrawString(200, 260, egg);
-					string eggprice = "price: " + to_string(100);
-					infoWin.DrawString(250, 260, eggprice);
-				}
-        catch (error) {}
+		if (eggInWareHouse > 0)
+		{
+			drawFirstMatch(infoWin, kEggImg, sizeof(kEggImg) / sizeof(kEggImg[0]), EGG_X, EGG_Y, ICON_W, ICON_H);
+			string egg = "Egg: " + to_string(eggInWareHouse);
+			infoWin.DrawString(160, 260, egg);
+			string eggprice = "  $" + to_string(100);
+			infoWin.DrawString(260, 260, eggprice);
 		}
-			if (milkInWareHouse > 0) {
-				try
-				{
-
-					image milkImg("../images/milk.jpg");
-					infoWin.DrawImage(milkImg, MILK_X, MILK_Y, ICON_W, ICON_H);
-					string milk = "Milk: " + to_string(milkInWareHouse);
-					infoWin.DrawString(320 - 3, 260, milk);
-					string milkprice = "price: " + to_string(200);
-					infoWin.DrawString(370 - 3, 260, milkprice);
-				}
-				catch (error) {}
+		if (milkInWareHouse > 0)
+		{
+			drawFirstMatch(infoWin, kMilkImg, sizeof(kMilkImg) / sizeof(kMilkImg[0]), MILK_X, MILK_Y, ICON_W, ICON_H);
+			string milk = "Milk: " + to_string(milkInWareHouse);
+			infoWin.DrawString(300, 260, milk);
+			string milkprice = "  $" + to_string(200);
+			infoWin.DrawString(400, 260, milkprice);
 		}
-        // Text
 
+		infoWin.WaitMouseClick(x, y);
 
+		if (x >= EXIT_X && x <= EXIT_X + EXIT_W &&
+			y >= EXIT_Y && y <= EXIT_Y + EXIT_H)
+			break;
 
-        infoWin.UpdateBuffer();
-        infoWin.WaitMouseClick(x, y);
-
-        if (x >= EXIT_X && x <= EXIT_X + EXIT_W &&
-            y >= EXIT_Y && y <= EXIT_Y + EXIT_H)
-        {
-            break;
-        }
-
-        // Sell Egg
-        if (x >= EGG_X && x <= EGG_X + ICON_W &&
-            y >= EGG_Y && y <= EGG_Y + ICON_H &&
-            eggInWareHouse > 0)
-        {
+		if (x >= EGG_X && x <= EGG_X + ICON_W &&
+			y >= EGG_Y && y <= EGG_Y + ICON_H &&
+			eggInWareHouse > 0)
 			sellegg();
-        }
 
-     
-        if (x >= MILK_X && x <= MILK_X + ICON_W &&
-            y >= MILK_Y && y <= MILK_Y + ICON_H &&
-            milkInWareHouse > 0)
-        {
+		if (x >= MILK_X && x <= MILK_X + ICON_W &&
+			y >= MILK_Y && y <= MILK_Y + ICON_H &&
+			milkInWareHouse > 0)
 			sellmilk();
-        }
-    }
+	}
 }
 void Game::redrawScene() const
 {
