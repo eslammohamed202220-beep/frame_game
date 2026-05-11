@@ -566,6 +566,7 @@ void Game::drawWarehouseUI(window& infoWin)
 	infoWin.DrawString(330, 260, milkText.c_str());
 }
 
+//fuck you abdallah
 void Game::openWarehouseWindow()
 {
     
