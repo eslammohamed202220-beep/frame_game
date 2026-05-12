@@ -113,22 +113,47 @@ Chick::Chick(Game* r_pGame, point r_point, int r_width, int r_height, string img
 
 void Chick::moveStep()
 {
-
-	if ((rand() % 4) != 0) return;
-
-	int dx = (rand() % 3) - 1;
-	int dy = (rand() % 3) - 1;
-	if (moveIfHungry(this, pGame, 45)) { dx = curr_vel.x; dy = curr_vel.y; }
-	int newX = RefPoint.x + dx * 8;
-	int newY = RefPoint.y + dy * 4;
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
 	int foodW = 1200;
 	int foodH = 170;
-	if (newX < foodX) newX = foodX;
-	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
-	if (newY < foodY) newY = foodY;
-	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
+
+	int dx = curr_vel.x;
+	int dy = curr_vel.y;
+
+	if (moveIfHungry(this, pGame, 45))
+	{
+		dx = curr_vel.x;
+		dy = curr_vel.y;
+	}
+
+	int newX = RefPoint.x + dx * 4;
+	int newY = RefPoint.y + dy * 2;
+
+	if (newX < foodX)
+	{
+		newX = foodX;
+		curr_vel.x = -curr_vel.x;
+	}
+
+	if (newX > foodX + foodW - width)
+	{
+		newX = foodX + foodW - width;
+		curr_vel.x = -curr_vel.x;
+	}
+
+	if (newY < foodY)
+	{
+		newY = foodY;
+		curr_vel.y = -curr_vel.y;
+	}
+
+	if (newY > foodY + foodH - height)
+	{
+		newY = foodY + foodH - height;
+		curr_vel.y = -curr_vel.y;
+	}
+
 	RefPoint.x = newX;
 	RefPoint.y = newY;
 }
@@ -139,51 +164,99 @@ Cow::Cow(Game* r_pGame, point r_point, int r_width, int r_height, string img_pat
 
 void Cow::moveStep()
 {
-	//window* pWind = pGame->getWind();
-	if ((rand() % 8) != 0) return;
-
-	int dx = (rand() % 3) - 1;
-	int dy = (rand() % 3) - 1;
-	if (moveIfHungry(this, pGame, 55)) { dx = curr_vel.x; dy = curr_vel.y; }
-	int newX = RefPoint.x + dx * 6;
-	int newY = RefPoint.y + dy * 3;
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
 	int foodW = 1200;
 	int foodH = 170;
-	if (newX < foodX) newX = foodX;
-	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
-	if (newY < foodY) newY = foodY;
-	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
+
+	int dx = curr_vel.x;
+	int dy = curr_vel.y;
+
+	if (moveIfHungry(this, pGame, 55))
+	{
+		dx = curr_vel.x;
+		dy = curr_vel.y;
+	}
+
+	int newX = RefPoint.x + dx * 3;
+	int newY = RefPoint.y + dy * 2;
+
+	if (newX < foodX)
+	{
+		newX = foodX;
+		curr_vel.x = -curr_vel.x;
+	}
+
+	if (newX > foodX + foodW - width)
+	{
+		newX = foodX + foodW - width;
+		curr_vel.x = -curr_vel.x;
+	}
+
+	if (newY < foodY)
+	{
+		newY = foodY;
+		curr_vel.y = -curr_vel.y;
+	}
+
+	if (newY > foodY + foodH - height)
+	{
+		newY = foodY + foodH - height;
+		curr_vel.y = -curr_vel.y;
+	}
+
 	RefPoint.x = newX;
 	RefPoint.y = newY;
-
 }
 
 Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
 }
-
 void Wolf::moveStep()
 {
-	if ((rand() % 5) != 0) return;
-	int dx = (rand() % 3) - 1;
-	int dy = (rand() % 3) - 1;
-	if (moveIfHungry(this, pGame, 35)) { dx = curr_vel.x; dy = curr_vel.y; }
-	int newX = RefPoint.x + dx * 10;
-	int newY = RefPoint.y + dy * 5;
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
 	int foodW = 1200;
 	int foodH = 170;
-	if (newX < foodX) newX = foodX;
-	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
-	if (newY < foodY) newY = foodY;
-	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
+
+	int dx = curr_vel.x;
+	int dy = curr_vel.y;
+
+	if (moveIfHungry(this, pGame, 35))
+	{
+		dx = curr_vel.x;
+		dy = curr_vel.y;
+	}
+
+	int newX = RefPoint.x + dx * 5;
+	int newY = RefPoint.y + dy * 3;
+
+	if (newX < foodX)
+	{
+		newX = foodX;
+		curr_vel.x = -curr_vel.x;
+	}
+
+	if (newX > foodX + foodW - width)
+	{
+		newX = foodX + foodW - width;
+		curr_vel.x = -curr_vel.x;
+	}
+
+	if (newY < foodY)
+	{
+		newY = foodY;
+		curr_vel.y = -curr_vel.y;
+	}
+
+	if (newY > foodY + foodH - height)
+	{
+		newY = foodY + foodH - height;
+		curr_vel.y = -curr_vel.y;
+	}
 
 	RefPoint.x = newX;
-	RefPoint.y = newY;
-}
+	RefPoint.y = newY;}
 void Chick::egg()
 {
 	Game::Item* item = new Game::Item();
