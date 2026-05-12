@@ -45,11 +45,13 @@ public:
 	int totalFoodConsumed = 0;
 	int randNum;
 	// add green area
-	struct GreenArea {
-		int x, y;
+	struct GreenArea
+	{
+		int x;
+		int y;
 		int counter;
 		bool active;
-		bool touched;
+		int eatTimer;
 	};
 	vector<GreenArea*> greenAreaList;
 

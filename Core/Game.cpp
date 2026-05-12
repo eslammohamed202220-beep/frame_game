@@ -478,89 +478,91 @@ void Game::drawGreenArea()
 	int foodH = 170;
 	int areaW = 50;
 	int areaH = 40;
-
 	GreenArea* newArea = new GreenArea();
 	newArea->x = foodX + rand() % (foodW - areaW);
 	newArea->y = foodY + rand() % (foodH - areaH);
-	newArea->counter = 29;
-	newArea->active = true;
-	newArea->touched = false;
+	newArea->counter = 10;     
+	newArea->active = true;    
+	newArea->eatTimer = 0;     
+
 	greenAreaList.push_back(newArea);
 }
 void Game::checkAnimalGrassCollision()
 {
+	const int grassW = 50;
+	const int grassH = 40;
+
+	const int chickW = 60;
+	const int chickH = 60;
+
+	const int cowW = 80;
+	const int cowH = 80;
+
 	for (int i = 0; i < (int)greenAreaList.size(); i++)
 	{
-		if (!greenAreaList[i]->active)
+		GreenArea* grass = greenAreaList[i];
+
+		if (!grass->active)
 			continue;
 
-		bool touchingNow = false;
-		Animal* eater = nullptr;
-
-		int grassW = 50;
-		int grassH = 40;
+		bool touched = false;
 
 		
 		for (int j = 0; j < (int)chickList.size(); j++)
 		{
-			point animalPos = chickList[j]->getPosition();
+			point chickPos = chickList[j]->getPosition();
 
-			int animalX = animalPos.x;
-			int animalY = animalPos.y;
+			int animalX = chickPos.x;
+			int animalY = chickPos.y;
 
-			int animalW = 60;
-			int animalH = 60;
-
-			if (animalX < greenAreaList[i]->x + grassW &&
-				animalX + animalW > greenAreaList[i]->x &&
-				animalY < greenAreaList[i]->y + grassH &&
-				animalY + animalH > greenAreaList[i]->y)
+			if (animalX < grass->x + grassW &&
+				animalX + chickW > grass->x &&
+				animalY < grass->y + grassH &&
+				animalY + chickH > grass->y)
 			{
-				touchingNow = true;
-				eater = chickList[j];
+				touched = true;
+				chickList[j]->hunger = 0;
 				break;
 			}
 		}
 
-		for (int j = 0; j < (int)cowList.size() && !touchingNow; j++)
+		
+		for (int j = 0; j < (int)cowList.size(); j++)
 		{
-			point animalPos = cowList[j]->getPosition();
+			point cowPos = cowList[j]->getPosition();
 
-			int animalX = animalPos.x;
-			int animalY = animalPos.y;
+			int animalX = cowPos.x;
+			int animalY = cowPos.y;
 
-			int animalW = 60;
-			int animalH = 60;
-
-			if (animalX < greenAreaList[i]->x + grassW &&
-				animalX + animalW > greenAreaList[i]->x &&
-				animalY < greenAreaList[i]->y + grassH &&
-				animalY + animalH > greenAreaList[i]->y)
+			if (animalX < grass->x + grassW &&
+				animalX + cowW > grass->x &&
+				animalY < grass->y + grassH &&
+				animalY + cowH > grass->y)
 			{
-				touchingNow = true;
-				eater = cowList[j];
+				touched = true;
+				cowList[j]->hunger = 0;
 				break;
 			}
 		}
 
-		if (touchingNow)
+		if (touched)
 		{
-			if (!greenAreaList[i]->touched)
+			grass->eatTimer++;
+			if (grass->eatTimer >= 10)
 			{
-				greenAreaList[i]->counter--;
-				totalFoodConsumed++;
-				if (eater != nullptr) eater->hunger = 0;
+				grass->counter--;
+				grass->eatTimer = 0;
 
-				if (greenAreaList[i]->counter <= 0)
+				if (grass->counter <= 0)
 				{
-					greenAreaList[i]->active = false;
+					grass->counter = 0;
+					grass->active = false;
 				}
-				greenAreaList[i]->touched = true;
 			}
 		}
 		else
 		{
-			greenAreaList[i]->touched = false;
+			grass->eatTimer = 0;
 		}
 	}
 }
@@ -745,7 +747,7 @@ void Game::redrawScene() const
 // ==========================
 void Game::playBackgroundMusic()
 {
-	mciSendString("open \"sounds/background.wav\" type waveaudio alias bgm", NULL, 0, NULL);
+	mciSendString("open \"D:/sounds/background.wav\" type waveaudio alias bgm", NULL, 0, NULL);
 	mciSendString("play bgm repeat", NULL, 0, NULL);
 }
 

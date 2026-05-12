@@ -9,6 +9,7 @@ using namespace std;
 
 static bool moveIfHungry(Animal* a, Game* g, int hungerLimit)
 {
+if (dynamic_cast<Wolf*>(a) != nullptr)return false;
 	a->hunger++;
 	if (a->hunger < (hungerLimit / 5)) return false;
 	Game::GreenArea* target = nullptr;
