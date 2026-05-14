@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <fstream>
+
 using namespace std;
 namespace {
 
@@ -737,7 +739,154 @@ void Game::redrawScene() const
 	writeStatus();
 	pWind->UpdateBuffer();
 }
+// ==========================
+// load and save
+// ==========================
 
+void Game::saveGame() const
+{
+	ofstream file("savegame.txt");
+	if (!file.is_open()) return;
+	file << "LEVEL " << level << "\n";
+	file << "BUDGET " << budget << "\n";
+	file << "TIMER " << timer << "\n";
+	int animalCount = 0;
+	for (int i = 0; i < (int)animalsList.size(); i++)
+		if (!dynamic_cast<Wolf*>(animalsList[i])) animalCount++;
+
+	file << "ANIMALS " << animalCount << "\n";
+	for (int i = 0; i < (int)animalsList.size(); i++)
+	{
+		point p = animalsList[i]->getPosition();
+		if (dynamic_cast<Chick*>(animalsList[i]))
+			file << "CHICK " << p.x << " " << p.y << "\n";
+		else if (dynamic_cast<Cow*>(animalsList[i]))
+			file << "COW " << p.x << " " << p.y << "\n";
+	}
+
+	
+	int wolfCount = 0;
+	for (int i = 0; i < (int)animalsList.size(); i++)
+		if (dynamic_cast<Wolf*>(animalsList[i])) wolfCount++;
+
+	file << "WOLVES " << wolfCount << "\n";
+	for (int i = 0; i < (int)animalsList.size(); i++)
+	{
+		if (dynamic_cast<Wolf*>(animalsList[i]))
+		{
+			point p = animalsList[i]->getPosition();
+			file << "WOLF " << p.x << " " << p.y << "\n";
+		}
+	}
+
+	int activeFood = 0;
+	for (int i = 0; i < (int)greenAreaList.size(); i++)
+		if (greenAreaList[i]->active) activeFood++;
+
+	file << "FOODAREAS " << activeFood << "\n";
+	for (int i = 0; i < (int)greenAreaList.size(); i++)
+	{
+		if (greenAreaList[i]->active)
+			file << "FOOD " << greenAreaList[i]->x << " " << greenAreaList[i]->y
+			<< " " << greenAreaList[i]->counter << "\n";
+	}
+
+	
+	file << "WAREHOUSE\n";
+	file << "EGGS " << eggInWareHouse << "\n";
+	file << "MILK " << milkInWareHouse << "\n";
+
+	file.close();
+	printMessage("Game saved successfully!");
+}
+
+void Game::loadGame()
+{
+	ifstream file("savegame.txt");
+	if (!file.is_open())
+	{
+		printMessage("No save file found!");
+		return;
+	}
+
+	for (int i = 0; i < (int)animalsList.size(); i++) delete animalsList[i];
+	animalsList.clear();
+	chickList.clear();
+	cowList.clear();
+
+	for (int i = 0; i < (int)greenAreaList.size(); i++) delete greenAreaList[i];
+	greenAreaList.clear();
+
+	for (int i = 0; i < (int)ItemList.size(); i++) delete ItemList[i];
+	ItemList.clear();
+
+	string token;
+
+	file >> token >> level;
+	file >> token >> budget;
+	file >> token >> timer;
+
+	
+	int animalCount;
+	file >> token >> animalCount;   
+	for (int i = 0; i < animalCount; i++)
+	{
+		string type; int x, y;
+		file >> type >> x >> y;
+		point p; p.x = x; p.y = y;
+		if (type == "CHICK")
+		{
+			Chick* c = new Chick(this, p, 50, 50, "images/chick.jpg");
+			animalsList.push_back(c);
+			chickList.push_back(c);
+		}
+		else if (type == "COW")
+		{
+			Cow* c = new Cow(this, p, 60, 60, "images/cow.jpg");
+			animalsList.push_back(c);
+			cowList.push_back(c);
+		}
+	}
+
+	
+	int wolfCount;
+	file >> token >> wolfCount;     
+	for (int i = 0; i < wolfCount; i++)
+	{
+		string type; int x, y;
+		file >> type >> x >> y;
+		point p; p.x = x; p.y = y;
+		Wolf* w = new Wolf(this, p, 70, 70, "images/wolff.jpg");
+		animalsList.push_back(w);
+	}
+
+	int foodCount;
+	file >> token >> foodCount;    
+	for (int i = 0; i < foodCount; i++)
+	{
+		string type; int x, y, counter;
+		file >> type >> x >> y >> counter;   
+		GreenArea* g = new GreenArea();
+		g->x = x; g->y = y;
+		g->counter = counter;
+		g->active = true;
+		g->eatTimer = 0;
+		greenAreaList.push_back(g);
+	}
+
+	
+	file >> token;                  
+	file >> token >> eggInWareHouse;  
+	file >> token >> milkInWareHouse;  
+
+	file.close();
+
+	lasttime = time(0);
+	lastWolfSpawnTime = time(0);
+
+	redrawScene();
+	printMessage("Game loaded successfully!");
+}
 
 
 

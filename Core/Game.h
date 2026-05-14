@@ -6,6 +6,7 @@
 #include <ctime>
 #include <vector>
 
+
 class Game
 {
 private:
@@ -28,7 +29,7 @@ private:
 	bool egg_show = false;
 	bool milk_show = false;
 	// Water area state
-
+	
 public:
 	int numchick = 0;
 	int numcow = 0;
@@ -108,6 +109,8 @@ public:
 	void restartGame();
 	void sellegg();
 	void sellmilk();
+	void saveGame() const;
+	void loadGame();
 	// Game logic
 	
 	// Main loop

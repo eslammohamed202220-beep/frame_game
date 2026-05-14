@@ -52,12 +52,12 @@ void ResumeIcon::onClick() { pGame->isPaused = false; }//fot resume game
 SaveIcon::SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path) {
 }
-void SaveIcon::onClick() {  }
+void SaveIcon::onClick() { pGame->saveGame(); }
 
 LoadIconn::LoadIconn(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path) {
 }
-void LoadIconn::onClick() {  }
+void LoadIconn::onClick() { pGame->loadGame(); }
 
 Toolbar::Toolbar(Game* r_pGame, point r_point, int r_width, int r_height) : Drawable(r_pGame, r_point, r_width, r_height)
 {
