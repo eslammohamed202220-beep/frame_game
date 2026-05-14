@@ -109,8 +109,7 @@ public:
 	void sellegg();
 	void sellmilk();
 	// Game logic
-	void playBackgroundMusic();
-	void stopBackgroundMusic();
+	
 	// Main loop
 	void go();
 

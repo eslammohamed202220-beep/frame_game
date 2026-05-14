@@ -6,9 +6,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
-#include <windows.h>
-#include <mmsystem.h>
-#pragma comment(lib, "winmm.lib")
 using namespace std;
 namespace {
 
@@ -78,7 +75,7 @@ Game::Game()
 	drawFieldBoundaries();
 	warehouseContent();
 	animalCounter();
-	playBackgroundMusic();
+	
 	//4- Create the Plane
 	//TODO: Add code to create and draw the Plane
 
@@ -119,7 +116,7 @@ Game::~Game()
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete pWind;
-	stopBackgroundMusic();
+
 }
 
 // ==========================
@@ -742,20 +739,7 @@ void Game::redrawScene() const
 }
 
 
-// ==========================
-// sound
-// ==========================
-void Game::playBackgroundMusic()
-{
-	mciSendString("open \"D:/sounds/background.wav\" type waveaudio alias bgm", NULL, 0, NULL);
-	mciSendString("play bgm repeat", NULL, 0, NULL);
-}
 
-void Game::stopBackgroundMusic()
-{
-	mciSendString("stop bgm", NULL, 0, NULL);
-	mciSendString("close bgm", NULL, 0, NULL);
-}
 
 // ==========================
 // Main Loop
