@@ -84,14 +84,21 @@ Game::Game()
 
 Game::~Game()
 {
-	// Clean up all allocated memory to prevent leaks
-	for (int i = 0; i < animalCount; i++)
-	{
-		if (animalsList[i]) delete animalsList[i];
-	}
-	for (int i = 0; i < ItemCount; i++) {
-		if (ItemList[i]) delete ItemList[i];
-	}
+
+	for (int i = 0; i < animalsList.size(); i++)
+		delete animalsList[i];
+
+	for (int i = 0; i < ItemList.size(); i++)
+		delete ItemList[i];
+
+	for (int i = 0; i < greenAreaList.size(); i++)
+		delete greenAreaList[i];
+
+	animalsList.clear();
+	chickList.clear();
+	cowList.clear();
+	ItemList.clear();
+	greenAreaList.clear();
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete pWind;
