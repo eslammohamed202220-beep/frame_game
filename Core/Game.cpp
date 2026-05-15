@@ -575,8 +575,10 @@ void Game::checkAnimalGrassCollision() {
         grass->eatTimer = 0;
 
         if (grass->counter <= 0) {
-          grass->counter = 0;
-          grass->active = false;
+          delete grass;
+          greenAreaList.erase(greenAreaList.begin() + i);
+          i--;
+          break;
         }
       }
     } else {
