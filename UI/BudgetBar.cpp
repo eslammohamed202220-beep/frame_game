@@ -64,8 +64,7 @@ void ChickIcon::onClick()
 		newChick->draw();
 		pGame->animalsList.push_back(newChick);
 		pGame->chickList.push_back(newChick);
-		//window* pWind = pGame->getWind();
-		//pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
+		pGame->playSfx("sounds/Chicken drop sfx.mp3");
 	}
 }
 
@@ -89,6 +88,7 @@ void CowIcon::onClick()
 		newCow->draw();
 		pGame->animalsList.push_back(newCow);
 		pGame->cowList.push_back(newCow);
+		pGame->playSfx("sounds/Cow drop sfx.mp3");
 	}
 }
 

@@ -136,4 +136,5 @@ public:
 	// Audio control
 	void pauseMusic();
 	void resumeMusic();
+	void playSfx(const char* path);
 };
