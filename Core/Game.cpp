@@ -130,25 +130,21 @@ Game::Game()
 
 Game::~Game()
 {
-	// Stop and release background music
-	if (audioReady)
-	{
-		ma_sound_uninit(&bgMusic);
-		ma_engine_uninit(&audioEngine);
-		audioReady = false;
-	}
+	for (int i = 0; i < animalsList.size(); i++)
+		delete animalsList[i];
 
-	// Clean up all allocated memory to prevent leaks
-	for (int i = 0; i < (int)animalsList.size(); i++)
-	{
-		if (animalsList[i]) delete animalsList[i];
-	}
-	for (int i = 0; i < (int)ItemList.size(); i++) {
-		if (ItemList[i]) delete ItemList[i];
-	}
-	for (int i = 0; i < (int)greenAreaList.size(); i++) {
-		if (greenAreaList[i]) delete greenAreaList[i];
-	}
+	for (int i = 0; i < ItemList.size(); i++)
+		delete ItemList[i];
+
+	for (int i = 0; i < greenAreaList.size(); i++)
+		delete greenAreaList[i];
+
+	animalsList.clear();
+	chickList.clear();
+	cowList.clear();
+	ItemList.clear();
+	greenAreaList.clear();
+
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete pWind;
