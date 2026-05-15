@@ -1,3 +1,5 @@
+// Must be defined in exactly ONE .cpp file before including Game.h
+#define MINIAUDIO_IMPLEMENTATION
 #include "Game.h"
 #include "../Config/GameConfig.h"
 #include "../CMUgraphicsLib/error.h"
@@ -100,10 +102,42 @@ Game::Game()
 	writeStatus();
 
 	pWind->UpdateBuffer();
+
+	// -------------------------------------------------------
+	// Background Music (miniaudio)
+	// Change the path below to your audio file if needed.
+	// Supported formats: mp3, wav, flac, ogg, etc.
+	// -------------------------------------------------------
+	const char* MUSIC_PATH = "sounds/background.mp3";
+
+	if (ma_engine_init(NULL, &audioEngine) == MA_SUCCESS)
+	{
+		if (ma_sound_init_from_file(&audioEngine, MUSIC_PATH,
+			MA_SOUND_FLAG_STREAM, NULL, NULL, &bgMusic) == MA_SUCCESS)
+		{
+			ma_sound_set_looping(&bgMusic, MA_TRUE);  // loop forever
+			ma_sound_set_volume(&bgMusic, 0.4f);       // 40% volume (0.0 to 1.0)
+			ma_sound_start(&bgMusic);
+			audioReady = true;
+		}
+		else
+		{
+			// File not found or unsupported — engine still alive, no music
+			ma_engine_uninit(&audioEngine);
+		}
+	}
 }
 
 Game::~Game()
 {
+	// Stop and release background music
+	if (audioReady)
+	{
+		ma_sound_uninit(&bgMusic);
+		ma_engine_uninit(&audioEngine);
+		audioReady = false;
+	}
+
 	// Clean up all allocated memory to prevent leaks
 	for (int i = 0; i < (int)animalsList.size(); i++)
 	{
@@ -118,7 +152,6 @@ Game::~Game()
 	delete gameToolbar;
 	delete gameBudgetbar;
 	delete pWind;
-
 }
 
 // ==========================
@@ -889,6 +922,22 @@ void Game::loadGame()
 }
 
 
+
+// ==========================
+// Audio Control
+// ==========================
+
+void Game::pauseMusic()
+{
+	if (audioReady)
+		ma_sound_stop(&bgMusic);
+}
+
+void Game::resumeMusic()
+{
+	if (audioReady)
+		ma_sound_start(&bgMusic);
+}
 
 // ==========================
 // Main Loop

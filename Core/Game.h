@@ -1,4 +1,9 @@
 #pragma once
+
+// miniaudio: single-header audio library (already in project root)
+// NOTE: MINIAUDIO_IMPLEMENTATION is defined only in Game.cpp
+#include "../miniaudio.h"
+
 #include "../CMUgraphicsLib/CMUgraphics.h"
 #include "../UI/Toolbar.h"
 #include "../UI/BudgetBar.h"
@@ -14,6 +19,11 @@ private:
 	window* pWind;	//Pointer to the CMU graphics window
 	Toolbar* gameToolbar;
 	Budgetbar* gameBudgetbar;
+
+	// Background music (miniaudio)
+	ma_engine audioEngine;
+	ma_sound  bgMusic;
+	bool      audioReady = false;
 
 	// Game state
 	int timer;
@@ -118,4 +128,8 @@ public:
 
 	// Window access
 	window* getWind() const;
+
+	// Audio control
+	void pauseMusic();
+	void resumeMusic();
 };

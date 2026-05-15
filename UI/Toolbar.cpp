@@ -42,12 +42,12 @@ void ExitIcon::onClick()
 PauseIcon::PauseIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path) {
 }
-void PauseIcon::onClick() { pGame->isPaused = true; }//for pause game
+void PauseIcon::onClick() { pGame->isPaused = true;  pGame->pauseMusic(); }  // pause game + music
 
 ResumeIcon::ResumeIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path) {
 }
-void ResumeIcon::onClick() { pGame->isPaused = false; }//fot resume game 
+void ResumeIcon::onClick() { pGame->isPaused = false; pGame->resumeMusic(); } // resume game + music
 
 SaveIcon::SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path)
 	: ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path) {
