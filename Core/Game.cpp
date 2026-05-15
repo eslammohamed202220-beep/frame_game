@@ -97,6 +97,8 @@ Game::Game()
 	timer = 60 + (level - 1) * 30;
 	lasttime = time(0);
 	lastWolfSpawnTime = time(0);
+	isGameOver = false;
+	gameStarted = true;
 
 	printBudget("BUDGET = $" + to_string(budget));
 	writeStatus();
@@ -104,9 +106,7 @@ Game::Game()
 	pWind->UpdateBuffer();
 
 	// -------------------------------------------------------
-	// Background Music (miniaudio)
-	// Change the path below to your audio file if needed.
-	// Supported formats: mp3, wav, flac, ogg, etc.
+	// Background Music
 	// -------------------------------------------------------
 	const char* MUSIC_PATH = "sounds/background.mp3";
 
@@ -266,16 +266,16 @@ void Game::printMessage(string msg) const
 void Game::writeStatus() const
 {
 	clearStatusBar();
-
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(20, BOLD, BY_NAME, "Arial");
-
 	int y_pos = config.windHeight - config.statusBarHeight + 10;
 
-	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level) + " | Current animals number = " + to_string(animalsList.size());
-
+	int goal = 2000 + (level - 1) * 1000;
+	string timelevelmsg = "  TIMER = " + to_string(timer) + " | LEVEL = " + to_string(level) + " | Animals = " + to_string(animalsList.size()) + " | GOAL: $" + to_string(goal);
 	pWind->DrawString(10, y_pos, timelevelmsg);
 }
+
+
 void Game::warehouseContent() const {
 	pWind->SetPen(config.penColor, 50);
 	pWind->SetFont(16, BOLD, BY_NAME, "Arial");
@@ -323,6 +323,57 @@ void Game::updateTimer()
 		egg_show = false;
 		milk_show = false;
 	}
+
+	checkLevelUp();
+
+	if (timer == 0 && gameStarted && !isGameOver)
+	{
+		gameOver();
+	}
+}
+
+void Game::checkLevelUp()
+{
+	int goal = 2000 + (level - 1) * 1000;
+	if (budget >= goal && timer > 0)
+	{
+		level++;
+		timer = 60 + (level - 1) * 30;
+		lasttime = time(0);
+	}
+}
+
+void Game::gameOver()
+{
+	isGameOver = true;
+	isPaused = true;
+
+	redrawScene();
+	int centerX = config.windWidth / 2;
+	int centerY = config.windHeight / 2;
+	pWind->SetPen(BLACK, 2);
+	pWind->SetBrush(BLACK);
+	pWind->DrawRectangle(centerX - 250, centerY - 60, centerX + 250, centerY + 60, FILLED);
+	pWind->SetPen(RED, 3);
+	pWind->DrawRectangle(centerX - 250, centerY - 60, centerX + 250, centerY + 60, FRAME);
+	pWind->SetPen(RED, 1);
+	pWind->SetFont(40, BOLD, BY_NAME, "Arial");
+	pWind->DrawString(centerX - 130, centerY - 30, "GAME OVER!");
+	pWind->SetPen(WHITE, 1);
+	pWind->SetFont(20, BOLD, BY_NAME, "Arial");
+	string finalMsg = "Final Budget: $" + to_string(budget);
+	pWind->DrawString(centerX - 100, centerY + 10, finalMsg);
+	pWind->UpdateBuffer();
+	Sleep(3000);
+	isGameOver = false;
+	isPaused = false;
+	gameStarted = true;
+	level = 1;
+	eggInWareHouse = 0;
+	milkInWareHouse = 0;
+	numchick = 0;
+	numcow = 0;
+	restartGame();
 }
 
 void Game::Wolfadd()

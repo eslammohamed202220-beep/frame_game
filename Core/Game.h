@@ -38,6 +38,8 @@ private:
 	bool wolf_Show = false;
 	bool egg_show = false;
 	bool milk_show = false;
+	bool isGameOver = false;
+	bool gameStarted = false;
 	// Water area state
 	
 public:
@@ -111,6 +113,8 @@ public:
 
 	// Game logic
 	void updateTimer();
+	void checkLevelUp();
+	void gameOver();
 	void Wolfadd();
 	void checkAnimalGrassCollision();
 	void eggadd();
