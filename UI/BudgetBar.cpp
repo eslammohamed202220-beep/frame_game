@@ -138,7 +138,7 @@ void Budgetbar::draw() const
 
 bool Budgetbar::handleClick(int x, int y)
 {
-	if (x > ANIMAL_COUNT * config.iconWidth)	//click outside toolbar boundaries
+	if (x >= ANIMAL_COUNT * config.iconWidth)	//click outside toolbar boundaries
 		return false;
 
 

@@ -107,7 +107,7 @@ void Toolbar::draw() const
 
 bool Toolbar::handleClick(int x, int y)
 {
-	if (x > ICON_COUNT * config.iconWidth)
+	if (x >= ICON_COUNT * config.iconWidth)
 		return false;
 
 	int clickedIconIndex = (x / config.iconWidth);
