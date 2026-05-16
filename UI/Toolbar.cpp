@@ -25,15 +25,20 @@ void ToolbarIcon::draw() const
 }
 
 RestartIcon::RestartIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
-{}
+{
+}
 
 void RestartIcon::onClick()
 {
-	pGame->restartGame();
+	// FIX: never call restartGame() directly from a click handler —
+	// it destroys animalsList while the game loop may be iterating it.
+	// Set a flag; the game loop checks and calls restartGame() safely.
+	pGame->pendingRestart = true;
 }
 
 ExitIcon::ExitIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : ToolbarIcon(r_pGame, r_point, r_width, r_height, img_path)
-{}
+{
+}
 
 void ExitIcon::onClick()
 {
@@ -121,4 +126,3 @@ bool Toolbar::handleClick(int x, int y)
 	return false;
 
 }
-

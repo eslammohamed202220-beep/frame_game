@@ -5,13 +5,15 @@
 #include "../miniaudio.h"
 
 #include "../CMUgraphicsLib/CMUgraphics.h"
-#include "../UI/Toolbar.h"
-#include "../UI/BudgetBar.h"
 #include "../Entities/Animal.h"
 #include <ctime>
 #include <string>
 #include <utility>
 #include <vector>
+
+// Forward declarations — full headers included in Game.cpp only
+class Toolbar;
+class Budgetbar;
 
 
 class Game
@@ -29,7 +31,6 @@ private:
 
 	// Game state
 	int timer;
-	int level;
 
 	// Time handling
 	time_t lasttime = time(0);
@@ -45,8 +46,9 @@ private:
 	string playerName;
 	vector<pair<string, int>> leaderboardEntries;
 	// Water area state
-	
+
 public:
+	int level;
 	int numchick = 0;
 	int numcow = 0;
 
@@ -132,10 +134,11 @@ public:
 	void restartGame();
 	void sellegg();
 	void sellmilk();
+	void checkWolfAnimalCollision();
 	void saveGame() const;
 	void loadGame();
 	// Game logic
-	
+
 	// Main loop
 	void go();
 

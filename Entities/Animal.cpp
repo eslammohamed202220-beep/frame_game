@@ -4,6 +4,7 @@
 #include "../CMUgraphicsLib/error.h"
 #include <iostream>
 #include <cstdlib>
+#include <climits>
 
 using namespace std;
 
@@ -38,7 +39,7 @@ static bool moveIfHungry(Animal* a, Game* g, int hungerLimit)
 	}
 
 	Game::GreenArea* target = nullptr;
-	int best = 1e9;
+	int best = INT_MAX; // FIX: was `1e9` (double assigned to int)
 	for (int i = 0; i < (int)g->greenAreaList.size(); i++)
 	{
 		Game::GreenArea* area = g->greenAreaList[i];
@@ -78,59 +79,83 @@ Animal::Animal(Game* r_pGame, point r_point, int r_width, int r_height, string i
 	curr_pos = r_point;
 	curr_vel.x = 1;
 	curr_vel.y = 1;
-	
 }
+
 
 void Animal::draw() const
 {
 	window* pWind = pGame->getWind();
 	auto hungerLimit = [&]() -> int
-	{
-		if (dynamic_cast<const Chick*>(this) != nullptr) return 45;
-		if (dynamic_cast<const Cow*>(this) != nullptr) return 55;
-		if (dynamic_cast<const Wolf*>(this) != nullptr) return 35;
-		return 50;
-	};
+		{
+			if (dynamic_cast<const Chick*>(this) != nullptr) return 45;
+			if (dynamic_cast<const Cow*>(this) != nullptr) return 55;
+			if (dynamic_cast<const Wolf*>(this) != nullptr) return 35;
+			return 50;
+		};
 	auto drawHungerBar = [&]()
-	{
-		if (dynamic_cast<const Wolf*>(this) != nullptr) return; // no hunger bar for wolves
-		const int barW = width;
-		const int barH = 6;
-		const int barX = RefPoint.x;
-		const int barY = RefPoint.y - 10;
-		int maxH = hungerLimit();
-		int clamped = hunger;
-		if (clamped < 0) clamped = 0;
-		if (clamped > maxH) clamped = maxH;
-		int barsFull = 5 - (clamped * 5) / maxH; // full at spawn, drops over time
-		if (barsFull < 0) barsFull = 0;
-		if (barsFull > 5) barsFull = 5;
-		int segW = barW / 5;
-		pWind->SetPen(BLACK, 1);
-		pWind->SetBrush(WHITE);
-		pWind->DrawRectangle(barX, barY, barX + barW, barY + barH, FILLED);
-		pWind->SetPen(GREEN, 1);
-		pWind->SetBrush(GREEN);
-		for (int i = 0; i < barsFull; i++)
 		{
-			int x1 = barX + i * segW + 1;
-			int x2 = barX + (i + 1) * segW - 1;
-			pWind->DrawRectangle(x1, barY + 1, x2, barY + barH - 1, FILLED);
-		}
-	};
+			if (dynamic_cast<const Wolf*>(this) != nullptr)
+			{
+				// Draw red health bar for wolves (5 segments = 5 clicks to kill)
+				const int barW = width;
+				const int barH = 6;
+				const int barX = RefPoint.x;
+				const int barY = RefPoint.y - 10;
+				const int maxHealth = 5;
+				int hp = health;
+				if (hp < 0) hp = 0;
+				if (hp > maxHealth) hp = maxHealth;
+				int segW = barW / maxHealth;
+				pWind->SetPen(BLACK, 1);
+				pWind->SetBrush(WHITE);
+				pWind->DrawRectangle(barX, barY, barX + barW, barY + barH, FILLED);
+				pWind->SetPen(RED, 1);
+				pWind->SetBrush(RED);
+				for (int i = 0; i < hp; i++)
+				{
+					int x1 = barX + i * segW + 1;
+					int x2 = barX + (i + 1) * segW - 1;
+					pWind->DrawRectangle(x1, barY + 1, x2, barY + barH - 1, FILLED);
+				}
+				return;
+			}
+			const int barW = width;
+			const int barH = 6;
+			const int barX = RefPoint.x;
+			const int barY = RefPoint.y - 10;
+			int maxH = hungerLimit();
+			int clamped = hunger;
+			if (clamped < 0) clamped = 0;
+			if (clamped > maxH) clamped = maxH;
+			int barsFull = 5 - (clamped * 5) / maxH;
+			if (barsFull < 0) barsFull = 0;
+			if (barsFull > 5) barsFull = 5;
+			int segW = barW / 5;
+			pWind->SetPen(BLACK, 1);
+			pWind->SetBrush(WHITE);
+			pWind->DrawRectangle(barX, barY, barX + barW, barY + barH, FILLED);
+			pWind->SetPen(GREEN, 1);
+			pWind->SetBrush(GREEN);
+			for (int i = 0; i < barsFull; i++)
+			{
+				int x1 = barX + i * segW + 1;
+				int x2 = barX + (i + 1) * segW - 1;
+				pWind->DrawRectangle(x1, barY + 1, x2, barY + barH - 1, FILLED);
+			}
+		};
 	auto tryPath = [&](const string& path) -> bool
-	{
-		try
 		{
-			image img(path);
-			pWind->DrawImage(img, RefPoint.x, RefPoint.y, width, height);
-			return true;
-		}
-		catch (error)
-		{
-			return false;
-		}
-	};
+			try
+			{
+				image img(path);
+				pWind->DrawImage(img, RefPoint.x, RefPoint.y, width, height);
+				return true;
+			}
+			catch (error)
+			{
+				return false;
+			}
+		};
 
 	bool drawn = tryPath(image_path);
 
@@ -253,49 +278,35 @@ void Cow::moveStep()
 Wolf::Wolf(Game* r_pGame, point r_point, int r_width, int r_height, string img_path) : Animal(r_pGame, r_point, r_width, r_height, img_path)
 {
 }
+
 void Wolf::moveStep()
 {
+	if ((rand() % 5) != 0) return;
+
+	int dx = (rand() % 3) - 1;
+	int dy = (rand() % 3) - 1;
+
+	if (moveIfHungry(this, pGame, 35)) { dx = curr_vel.x; dy = curr_vel.y; }
+
+	int speed = 10 + (pGame->level * 3);
+
+	int newX = RefPoint.x + dx * speed;
+	int newY = RefPoint.y + dy * (speed / 2);
+
 	int foodX = 0;
 	int foodY = config.windHeight - config.statusBarHeight - 180;
 	int foodW = 1200;
 	int foodH = 170;
 
-	int dx = curr_vel.x;
-	int dy = curr_vel.y;
-
-	if (moveIfHungry(this, pGame, 35))
-	{
-		dx = curr_vel.x;
-		dy = curr_vel.y;
-	}
-
-	int newX = RefPoint.x + dx * config.wolfMoveStepPx;
-	int newY = RefPoint.y + dy * (config.wolfMoveStepPx - 1);
-
-	if (newX < foodX)
-	{
-		newX = foodX;
-		curr_vel.x = -curr_vel.x;
-	}
-	else if (newX > foodX + foodW - width)
-	{
-		newX = foodX + foodW - width;
-		curr_vel.x = -curr_vel.x;
-	}
-
-	if (newY < foodY)
-	{
-		newY = foodY;
-		curr_vel.y = -curr_vel.y;
-	}
-	else if (newY > foodY + foodH - height)
-	{
-		newY = foodY + foodH - height;
-		curr_vel.y = -curr_vel.y;
-	}
+	if (newX < foodX) newX = foodX;
+	if (newX > foodX + foodW - width) newX = foodX + foodW - width;
+	if (newY < foodY) newY = foodY;
+	if (newY > foodY + foodH - height) newY = foodY + foodH - height;
 
 	RefPoint.x = newX;
-	RefPoint.y = newY;}
+	RefPoint.y = newY;
+}
+
 void Chick::egg()
 {
 	Game::Item* item = new Game::Item();
@@ -304,6 +315,7 @@ void Chick::egg()
 	item->type = "egg";
 	pGame->ItemList.push_back(item);
 }
+
 void Cow::milk()
 {
 	Game::Item* item = new Game::Item();

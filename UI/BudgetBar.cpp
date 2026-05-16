@@ -36,7 +36,7 @@ CowIcon::CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string
 }
 void ChickIcon::onClick()
 {
-	
+
 	window* pWind = pGame->getWind();
 	//TO DO: add code for cleanup and game exit here
 	/*
@@ -44,7 +44,7 @@ void ChickIcon::onClick()
 	window* pWind = pGame->getWind();
 	pWind->DrawImage(image_path, RefPoint.x, RefPoint.y, width, height);
 	*/
-	
+
 	//Chick* new_chick = new Chick(pGame, RefPoint, 30, 30, "images\\Chick.png");
 	if (pGame->budget >= 100) {
 		pGame->budget = pGame->budget - 100;
@@ -53,8 +53,8 @@ void ChickIcon::onClick()
 		pGame->printBudget(budget_string);
 
 		point p;
-	    p.x = range_min_x + rand() % (range_max_x - range_min_x);
-        p.y = range_min_y + rand() % (range_max_y - range_min_y);
+		p.x = range_min_x + rand() % (range_max_x - range_min_x);
+		p.y = range_min_y + rand() % (range_max_y - range_min_y);
 		Chick* newChick = new Chick(pGame, p, 50, 50, "images/chick.jpg");
 		pGame->numchick++;
 		pGame->animalsList.push_back(newChick);
@@ -65,7 +65,7 @@ void ChickIcon::onClick()
 
 void CowIcon::onClick()
 {
-	if (pGame->budget >= 300 )
+	if (pGame->budget >= 300)
 	{
 		pGame->budget = pGame->budget - 300;
 
@@ -127,7 +127,7 @@ void Budgetbar::draw() const
 		iconsList[i]->draw();
 	window* pWind = pGame->getWind();
 	pWind->SetPen(BLACK, 3);
-	pWind->DrawLine(0, 2*config.toolBarHeight, pWind->GetWidth(), 2*config.toolBarHeight);
+	pWind->DrawLine(0, 2 * config.toolBarHeight, pWind->GetWidth(), 2 * config.toolBarHeight);
 }
 
 bool Budgetbar::handleClick(int x, int y)

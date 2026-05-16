@@ -9,6 +9,7 @@ private:
 	string image_path;
 public:
 	ToolbarIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual ~ToolbarIcon() {}
 	virtual void draw() const override;
 	virtual void onClick() = 0;   //The action that should be taken when this icon is clicked
 };
@@ -29,29 +30,29 @@ public:
 class PauseIcon : public ToolbarIcon
 {
 public:
-    PauseIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-    virtual void onClick();
+	PauseIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void onClick();
 };
 
 class ResumeIcon : public ToolbarIcon
 {
 public:
-    ResumeIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-    virtual void onClick();
+	ResumeIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void onClick();
 };
 
 class SaveIcon : public ToolbarIcon
 {
 public:
-    SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-    virtual void onClick();
+	SaveIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void onClick();
 };
 
 class LoadIconn : public ToolbarIcon
 {
 public:
-    LoadIconn(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
-    virtual void onClick();
+	LoadIconn(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
+	virtual void onClick();
 };
 
 
@@ -81,4 +82,3 @@ public:
 	bool handleClick(int x, int y);	//handles clicks on toolbar icons, returns true if exit is clicked
 
 };
-
