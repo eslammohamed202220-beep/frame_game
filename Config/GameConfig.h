@@ -21,7 +21,15 @@ struct  //contains all game configurations (MAY be loaded from a configuration f
 		statusBarColor = RED;	//background color of the status
 	int penWidth = 3;			//width of the pen that draws shapes
 
-	int	iconWidth = 70;			//Width of each icon in toolbar 
+	int	iconWidth = 70;			//Width of each icon in toolbar
+
+	// Main loop / simulation — CMUgraphics is unstable below ~20ms Sleep
+	int gameLoopDelayMs = 30;			// ~33 updates/sec (original stable rate)
+	int animalMoveStepPxX = 4;			// horizontal step per update (chick/cow)
+	int animalMoveStepPxY = 3;			// vertical step per update (chick/cow)
+	int wolfMoveStepPx = 5;
+	int hungerTickInterval = 8;
+	int grassEatTicksRequired = 10;
 } config;
 
 

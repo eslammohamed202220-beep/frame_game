@@ -107,10 +107,13 @@ void Toolbar::draw() const
 
 bool Toolbar::handleClick(int x, int y)
 {
-	if (x >= ICON_COUNT * config.iconWidth)
+	if (x < 0 || x >= ICON_COUNT * config.iconWidth)
 		return false;
 
-	int clickedIconIndex = (x / config.iconWidth);
+	int clickedIconIndex = x / config.iconWidth;
+	if (clickedIconIndex < 0 || clickedIconIndex >= ICON_COUNT)
+		return false;
+
 	iconsList[clickedIconIndex]->onClick();
 
 	if (clickedIconIndex == ICON_EXIT) return true;

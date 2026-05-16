@@ -55,13 +55,8 @@ void ChickIcon::onClick()
 		point p;
 	    p.x = range_min_x + rand() % (range_max_x - range_min_x);
         p.y = range_min_y + rand() % (range_max_y - range_min_y);
-		Chick* newChick = new Chick(pGame, p, 50, 50, image_path);
-		pWind->SetPen(config.penColor, 50);
-		pWind->SetFont(20, BOLD, BY_NAME, "Arial");
-		pWind->DrawString(p.x + 250, p.y - 100, to_string(pGame->numchick));
-		//numchick++;
-		chickList.push_back(newChick);
-		newChick->draw();
+		Chick* newChick = new Chick(pGame, p, 50, 50, "images/chick.jpg");
+		pGame->numchick++;
 		pGame->animalsList.push_back(newChick);
 		pGame->chickList.push_back(newChick);
 		pGame->playSfx("sounds/Chicken drop sfx.mp3");
@@ -83,9 +78,8 @@ void CowIcon::onClick()
 		p.x = range_min_x + rand() % (range_max_x - range_min_x);
 		p.y = range_min_y + rand() % (range_max_y - range_min_y);
 
-		Cow* newCow = new Cow(pGame, p, 60, 60, image_path);
-		cowList.push_back(newCow);
-		newCow->draw();
+		Cow* newCow = new Cow(pGame, p, 60, 60, "images/cow.jpg");
+		pGame->numcow++;
 		pGame->animalsList.push_back(newCow);
 		pGame->cowList.push_back(newCow);
 		pGame->playSfx("sounds/Cow drop sfx.mp3");
@@ -138,17 +132,14 @@ void Budgetbar::draw() const
 
 bool Budgetbar::handleClick(int x, int y)
 {
-	if (x >= ANIMAL_COUNT * config.iconWidth)	//click outside toolbar boundaries
+	if (x < 0 || x >= ANIMAL_COUNT * config.iconWidth)
 		return false;
 
+	int clickedIconIndex = x / config.iconWidth;
+	if (clickedIconIndex < 0 || clickedIconIndex >= ANIMAL_COUNT)
+		return false;
 
-	//Check whick icon was clicked
-	//==> This assumes that menu icons are lined up horizontally <==
-	//Divide x co-ord of the point clicked by the icon width (int division)
-	//if division result is 0 ==> first icon is clicked, if 1 ==> 2nd icon and so on
-
-	int clickedIconIndex = (x / config.iconWidth);
-	iconsList[clickedIconIndex]->onClick();	//execute onClick action of clicled icon
+	iconsList[clickedIconIndex]->onClick();
 
 	//if (clickedIconIndex == ICON_EXIT) return true;
 

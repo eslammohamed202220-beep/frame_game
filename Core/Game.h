@@ -9,6 +9,8 @@
 #include "../UI/BudgetBar.h"
 #include "../Entities/Animal.h"
 #include <ctime>
+#include <string>
+#include <utility>
 #include <vector>
 
 
@@ -40,6 +42,8 @@ private:
 	bool milk_show = false;
 	bool isGameOver = false;
 	bool gameStarted = false;
+	string playerName;
+	vector<pair<string, int>> leaderboardEntries;
 	// Water area state
 	
 public:
@@ -115,6 +119,10 @@ public:
 	void updateTimer();
 	void checkLevelUp();
 	void gameOver();
+	void promptUsername();
+	void loadLeaderboard();
+	void saveLeaderboard() const;
+	void updatePlayerHighScore(int score);
 	void Wolfadd();
 	void checkAnimalGrassCollision();
 	void eggadd();

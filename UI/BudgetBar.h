@@ -28,15 +28,12 @@ public:
 class ChickIcon : public BudgetbarIcon
 {
 public:
-	vector<Chick*> chickList;
 	ChickIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 };
 class CowIcon : public BudgetbarIcon
 {
 public:
-	vector<Cow*> cowList;
-
 	CowIcon(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void onClick();
 };

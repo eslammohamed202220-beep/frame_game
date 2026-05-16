@@ -5,6 +5,7 @@
 #include "../Config/GameConfig.h"
 #include "../UI/BudgetBar.h"
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -41,6 +42,37 @@ bool drawFirstMatch(window &w, const char *const *paths, size_t nPaths, int x,
       return true;
   }
   return false;
+}
+
+const char *LEADERBOARD_FILE = "leaderboard.txt";
+const int LEADERBOARD_TOP_N = 10;
+
+string sanitizeUsername(string name) {
+  string out;
+  for (char c : name) {
+    if (isalnum((unsigned char)c) || c == '_')
+      out += c;
+  }
+  if (out.empty())
+    return "Player";
+  if (out.size() > 15)
+    out.resize(15);
+  return out;
+}
+
+int animalHungerLimit(const Animal *a) {
+  if (dynamic_cast<const Cow *>(a) != nullptr)
+    return 55;
+  if (dynamic_cast<const Chick *>(a) != nullptr)
+    return 45;
+  return 50;
+}
+
+bool animalIsHungryEnoughToEat(const Animal *a) {
+  const int limit = animalHungerLimit(a);
+  if (dynamic_cast<const Chick *>(a) != nullptr)
+    return a->hunger >= (3 * limit) / 5; // 2 of 5 bars remaining
+  return a->hunger >= limit / 5;
 }
 
 } // namespace
@@ -90,7 +122,8 @@ Game::Game() {
   lasttime = time(0);
   lastWolfSpawnTime = time(0);
   isGameOver = false;
-  gameStarted = true;
+  gameStarted = false;
+  playerName = "Player";
 
   printBudget("BUDGET = $" + to_string(budget));
   writeStatus();
@@ -251,8 +284,8 @@ void Game::writeStatus() const {
   int y_pos = config.windHeight - config.statusBarHeight + 10;
 
   int goal = 2000 + (level - 1) * 1000;
-  string timelevelmsg = "  TIMER = " + to_string(timer) +
-                        " | LEVEL = " + to_string(level) +
+  string timelevelmsg = "  PLAYER: " + playerName + " | TIMER = " +
+                        to_string(timer) + " | LEVEL = " + to_string(level) +
                         " | Animals = " + to_string(animalsList.size()) +
                         " | GOAL: $" + to_string(goal);
   pWind->DrawString(10, y_pos, timelevelmsg);
@@ -320,29 +353,187 @@ void Game::checkLevelUp() {
   }
 }
 
+void Game::loadLeaderboard() {
+  leaderboardEntries.clear();
+  ifstream file(LEADERBOARD_FILE);
+  if (!file)
+    return;
+
+  string name;
+  int score = 0;
+  while (file >> name >> score) {
+    bool found = false;
+    for (auto &entry : leaderboardEntries) {
+      if (entry.first == name) {
+        entry.second = max(entry.second, score);
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+      leaderboardEntries.push_back({name, score});
+  }
+
+  sort(leaderboardEntries.begin(), leaderboardEntries.end(),
+       [](const pair<string, int> &a, const pair<string, int> &b) {
+         return a.second > b.second;
+       });
+}
+
+void Game::saveLeaderboard() const {
+  ofstream file(LEADERBOARD_FILE);
+  if (!file)
+    return;
+
+  for (const auto &entry : leaderboardEntries)
+    file << entry.first << " " << entry.second << "\n";
+}
+
+void Game::updatePlayerHighScore(int score) {
+  bool found = false;
+  for (auto &entry : leaderboardEntries) {
+    if (entry.first == playerName) {
+      entry.second = max(entry.second, score);
+      found = true;
+      break;
+    }
+  }
+  if (!found)
+    leaderboardEntries.push_back({playerName, score});
+
+  sort(leaderboardEntries.begin(), leaderboardEntries.end(),
+       [](const pair<string, int> &a, const pair<string, int> &b) {
+         return a.second > b.second;
+       });
+  saveLeaderboard();
+}
+
+void Game::promptUsername() {
+  const int cx = config.windWidth / 2;
+  const int cy = config.windHeight / 2;
+  const int panelL = cx - 300;
+  const int panelR = cx + 300;
+  const int panelT = cy - 100;
+  const int panelB = cy + 105;
+  const int inputY = cy + 25;
+
+  auto drawDialog = [&](const string &typed) {
+    redrawScene();
+    pWind->SetPen(BLACK, 2);
+    pWind->SetBrush(LIGHTGRAY);
+    pWind->DrawRectangle(panelL, panelT, panelR, panelB, FILLED);
+    pWind->SetPen(BLUE, 2);
+    pWind->DrawRectangle(panelL, panelT, panelR, panelB, FRAME);
+    pWind->SetPen(BLACK, 1);
+    pWind->SetFont(28, BOLD, BY_NAME, "Arial");
+    pWind->DrawString(cx - 110, cy - 70, "Enter Username");
+    pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+    pWind->DrawString(cx - 200, cy - 30, "Type your name, then press ENTER");
+
+    pWind->SetBrush(WHITE);
+    pWind->SetPen(BLACK, 2);
+    pWind->DrawRectangle(cx - 220, inputY, cx + 220, inputY + 36, FILLED);
+    pWind->DrawRectangle(cx - 220, inputY, cx + 220, inputY + 36, FRAME);
+    pWind->SetFont(20, BOLD, BY_NAME, "Arial");
+    pWind->DrawString(cx - 210, inputY + 8, typed.empty() ? " " : typed);
+    pWind->UpdateBuffer();
+  };
+
+  string label;
+  char key = '\0';
+  keytype ktype = NO_KEYPRESS;
+  pWind->FlushKeyQueue();
+  drawDialog(label);
+
+  while (true) {
+    ktype = pWind->WaitKeyPress(key);
+    if (ktype == ESCAPE)
+      break;
+    if (key == 13)
+      break;
+    if (key == 8) {
+      if (!label.empty())
+        label.pop_back();
+    } else {
+      label += key;
+    }
+    drawDialog(label);
+  }
+
+  playerName = sanitizeUsername(label);
+  printMessage("Welcome, " + playerName + "!");
+  pWind->UpdateBuffer();
+  Sleep(400);
+}
+
 void Game::gameOver() {
   isGameOver = true;
   isPaused = true;
 
+  const int score = budget;
+  int previousHigh = 0;
+  for (const auto &entry : leaderboardEntries) {
+    if (entry.first == playerName) {
+      previousHigh = entry.second;
+      break;
+    }
+  }
+
+  updatePlayerHighScore(score);
+  const bool newRecord = score > previousHigh;
+
   redrawScene();
   int centerX = config.windWidth / 2;
   int centerY = config.windHeight / 2;
+  int topN = min((int)leaderboardEntries.size(), LEADERBOARD_TOP_N);
+  int panelTop = centerY - 95 - topN * 24;
+  int panelBottom = centerY + 115;
+
   pWind->SetPen(BLACK, 2);
   pWind->SetBrush(BLACK);
-  pWind->DrawRectangle(centerX - 250, centerY - 60, centerX + 250, centerY + 60,
+  pWind->DrawRectangle(centerX - 290, panelTop, centerX + 290, panelBottom,
                        FILLED);
   pWind->SetPen(RED, 3);
-  pWind->DrawRectangle(centerX - 250, centerY - 60, centerX + 250, centerY + 60,
+  pWind->DrawRectangle(centerX - 290, panelTop, centerX + 290, panelBottom,
                        FRAME);
+
   pWind->SetPen(RED, 1);
   pWind->SetFont(40, BOLD, BY_NAME, "Arial");
-  pWind->DrawString(centerX - 130, centerY - 30, "GAME OVER!");
+  pWind->DrawString(centerX - 130, panelTop + 15, "GAME OVER!");
+
   pWind->SetPen(WHITE, 1);
   pWind->SetFont(20, BOLD, BY_NAME, "Arial");
-  string finalMsg = "Final Budget: $" + to_string(budget);
-  pWind->DrawString(centerX - 100, centerY + 10, finalMsg);
+  string finalMsg =
+      playerName + " - Final Score: $" + to_string(score);
+  pWind->DrawString(centerX - 170, panelTop + 60, finalMsg);
+
+  if (newRecord) {
+    pWind->SetPen(YELLOW, 1);
+    pWind->SetFont(18, BOLD, BY_NAME, "Arial");
+    pWind->DrawString(centerX - 95, panelTop + 88, "NEW HIGH SCORE!");
+  }
+
+  pWind->SetPen(LIGHTGRAY, 1);
+  pWind->SetFont(18, BOLD, BY_NAME, "Arial");
+  pWind->DrawString(centerX - 70, centerY - 15, "TOP SCORES");
+
+  int y = centerY + 10;
+  for (int i = 0; i < topN; i++) {
+    const string &name = leaderboardEntries[i].first;
+    const int high = leaderboardEntries[i].second;
+    string line =
+        to_string(i + 1) + ". " + name + "  $" + to_string(high);
+    if (name == playerName)
+      pWind->SetPen(YELLOW, 1);
+    else
+      pWind->SetPen(WHITE, 1);
+    pWind->SetFont(16, BOLD, BY_NAME, "Arial");
+    pWind->DrawString(centerX - 160, y, line);
+    y += 24;
+  }
+
   pWind->UpdateBuffer();
-  Sleep(3000);
+  Sleep(6000);
   isGameOver = false;
   isPaused = false;
   gameStarted = true;
@@ -538,7 +729,8 @@ void Game::checkAnimalGrassCollision() {
     if (!grass->active)
       continue;
 
-    bool touched = false;
+    bool eating = false;
+    bool onGrass = false;
 
     for (int j = 0; j < (int)chickList.size(); j++) {
       point chickPos = chickList[j]->getPosition();
@@ -548,9 +740,11 @@ void Game::checkAnimalGrassCollision() {
 
       if (animalX < grass->x + grassW && animalX + chickW > grass->x &&
           animalY < grass->y + grassH && animalY + chickH > grass->y) {
-        touched = true;
-        chickList[j]->hunger = 0;
-        break;
+        onGrass = true;
+        if (animalIsHungryEnoughToEat(chickList[j])) {
+          eating = true;
+          chickList[j]->hunger = 0;
+        }
       }
     }
 
@@ -562,15 +756,21 @@ void Game::checkAnimalGrassCollision() {
 
       if (animalX < grass->x + grassW && animalX + cowW > grass->x &&
           animalY < grass->y + grassH && animalY + cowH > grass->y) {
-        touched = true;
-        cowList[j]->hunger = 0;
-        break;
+        onGrass = true;
+        if (animalIsHungryEnoughToEat(cowList[j])) {
+          eating = true;
+          cowList[j]->hunger = 0;
+        }
       }
     }
 
-    if (touched) {
+    // Keep eating until the patch is consumed if a hungry animal started a meal
+    if (grass->eatTimer > 0 && onGrass)
+      eating = true;
+
+    if (eating) {
       grass->eatTimer++;
-      if (grass->eatTimer >= 10) {
+      if (grass->eatTimer >= config.grassEatTicksRequired) {
         grass->counter--;
         grass->eatTimer = 0;
 
@@ -927,12 +1127,19 @@ void Game::playSfx(const char *path) {
 // ==========================
 
 void Game::go() {
-  printMessage("Entered go()");
   int x, y;
   bool isExit = false;
 
   pWind->ChangeTitle(
       "- - - - - - - - - - Farm Frenzy (CIE101-project) - - - - - - - - - -");
+
+  loadLeaderboard();
+  promptUsername();
+  gameStarted = true;
+  lasttime = time(0);
+  writeStatus();
+  pWind->UpdateBuffer();
+
   do {
     if (!isPaused) {
       updateTimer();
@@ -971,7 +1178,7 @@ void Game::go() {
       }
     }
 
-    Sleep(30);
+    Sleep(config.gameLoopDelayMs);
 
   } while (!isExit);
 }

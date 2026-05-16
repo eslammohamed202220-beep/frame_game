@@ -10,6 +10,7 @@ public:
 	point curr_pos;
 	point curr_vel;
 	int hunger = 0;
+	int moveCount = 0;
 
 	Animal(Game* r_pGame, point r_point, int r_width, int r_height, string img_path);
 	virtual void draw() const override;

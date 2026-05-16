@@ -7,11 +7,36 @@
 
 using namespace std;
 
+static int seekFoodHungerThreshold(Animal* a, int hungerLimit)
+{
+	// Chick: only path to food when 2 of 5 hunger bars remain
+	if (dynamic_cast<Chick*>(a) != nullptr)
+		return (3 * hungerLimit) / 5;
+	return hungerLimit / 5;
+}
+
+static void ensureWanderVelocity(Animal* a)
+{
+	if (a->curr_vel.x == 0)
+		a->curr_vel.x = (rand() % 2) ? 1 : -1;
+	if (a->curr_vel.y == 0)
+		a->curr_vel.y = (rand() % 2) ? 1 : -1;
+}
+
 static bool moveIfHungry(Animal* a, Game* g, int hungerLimit)
 {
-if (dynamic_cast<Wolf*>(a) != nullptr)return false;
-	a->hunger++;
-	if (a->hunger < (hungerLimit / 5)) return false;
+	if (dynamic_cast<Wolf*>(a) != nullptr)
+		return false;
+	if (++a->moveCount % config.hungerTickInterval == 0)
+		a->hunger++;
+
+	int seekAt = seekFoodHungerThreshold(a, hungerLimit);
+	if (a->hunger < seekAt)
+	{
+		ensureWanderVelocity(a);
+		return false;
+	}
+
 	Game::GreenArea* target = nullptr;
 	int best = 1e9;
 	for (int i = 0; i < (int)g->greenAreaList.size(); i++)
@@ -22,9 +47,28 @@ if (dynamic_cast<Wolf*>(a) != nullptr)return false;
 		int d = abs(a->getPosition().x - cx) + abs(a->getPosition().y - cy);
 		if (d < best) { best = d; target = area; }
 	}
-	if (!target) return false;
-	a->curr_vel.x = (target->x > a->getPosition().x) ? 1 : ((target->x < a->getPosition().x) ? -1 : 0);
-	a->curr_vel.y = (target->y > a->getPosition().y) ? 1 : ((target->y < a->getPosition().y) ? -1 : 0);
+	if (!target)
+	{
+		ensureWanderVelocity(a);
+		return false;
+	}
+
+	int ax = a->getPosition().x;
+	int ay = a->getPosition().y;
+	if (target->x + 25 > ax)
+		a->curr_vel.x = 1;
+	else if (target->x + 25 < ax)
+		a->curr_vel.x = -1;
+	else
+		a->curr_vel.x = (rand() % 2) ? 1 : -1;
+
+	if (target->y + 20 > ay)
+		a->curr_vel.y = 1;
+	else if (target->y + 20 < ay)
+		a->curr_vel.y = -1;
+	else
+		a->curr_vel.y = (rand() % 2) ? 1 : -1;
+
 	return true;
 }
 
@@ -128,16 +172,15 @@ void Chick::moveStep()
 		dy = curr_vel.y;
 	}
 
-	int newX = RefPoint.x + dx * 4;
-	int newY = RefPoint.y + dy * 2;
+	int newX = RefPoint.x + dx * config.animalMoveStepPxX;
+	int newY = RefPoint.y + dy * config.animalMoveStepPxY;
 
 	if (newX < foodX)
 	{
 		newX = foodX;
 		curr_vel.x = -curr_vel.x;
 	}
-
-	if (newX > foodX + foodW - width)
+	else if (newX > foodX + foodW - width)
 	{
 		newX = foodX + foodW - width;
 		curr_vel.x = -curr_vel.x;
@@ -148,8 +191,7 @@ void Chick::moveStep()
 		newY = foodY;
 		curr_vel.y = -curr_vel.y;
 	}
-
-	if (newY > foodY + foodH - height)
+	else if (newY > foodY + foodH - height)
 	{
 		newY = foodY + foodH - height;
 		curr_vel.y = -curr_vel.y;
@@ -179,16 +221,15 @@ void Cow::moveStep()
 		dy = curr_vel.y;
 	}
 
-	int newX = RefPoint.x + dx * 3;
-	int newY = RefPoint.y + dy * 2;
+	int newX = RefPoint.x + dx * config.animalMoveStepPxX;
+	int newY = RefPoint.y + dy * config.animalMoveStepPxY;
 
 	if (newX < foodX)
 	{
 		newX = foodX;
 		curr_vel.x = -curr_vel.x;
 	}
-
-	if (newX > foodX + foodW - width)
+	else if (newX > foodX + foodW - width)
 	{
 		newX = foodX + foodW - width;
 		curr_vel.x = -curr_vel.x;
@@ -199,8 +240,7 @@ void Cow::moveStep()
 		newY = foodY;
 		curr_vel.y = -curr_vel.y;
 	}
-
-	if (newY > foodY + foodH - height)
+	else if (newY > foodY + foodH - height)
 	{
 		newY = foodY + foodH - height;
 		curr_vel.y = -curr_vel.y;
@@ -229,16 +269,15 @@ void Wolf::moveStep()
 		dy = curr_vel.y;
 	}
 
-	int newX = RefPoint.x + dx * 5;
-	int newY = RefPoint.y + dy * 3;
+	int newX = RefPoint.x + dx * config.wolfMoveStepPx;
+	int newY = RefPoint.y + dy * (config.wolfMoveStepPx - 1);
 
 	if (newX < foodX)
 	{
 		newX = foodX;
 		curr_vel.x = -curr_vel.x;
 	}
-
-	if (newX > foodX + foodW - width)
+	else if (newX > foodX + foodW - width)
 	{
 		newX = foodX + foodW - width;
 		curr_vel.x = -curr_vel.x;
@@ -249,8 +288,7 @@ void Wolf::moveStep()
 		newY = foodY;
 		curr_vel.y = -curr_vel.y;
 	}
-
-	if (newY > foodY + foodH - height)
+	else if (newY > foodY + foodH - height)
 	{
 		newY = foodY + foodH - height;
 		curr_vel.y = -curr_vel.y;
