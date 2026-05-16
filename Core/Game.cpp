@@ -3,7 +3,8 @@
 #include "Game.h"
 #include "../CMUgraphicsLib/error.h"
 #include "../Config/GameConfig.h"
-#include "../UI/BudgetBar.h"
+#include "../UI/Toolbar.h"    // full type needed — forward-declared in Game.h
+#include "../UI/BudgetBar.h"  // full type needed — forward-declared in Game.h
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -153,22 +154,19 @@ Game::Game() {
 }
 
 Game::~Game() {
-    // FIX: clear typed alias lists FIRST — they point to the same objects as
-    // animalsList. Clearing them here means no dangling pointers exist while
-    // the master list is being deleted below.
+    for (int i = 0; i < animalsList.size(); i++)
+        delete animalsList[i];
+
+    for (int i = 0; i < ItemList.size(); i++)
+        delete ItemList[i];
+
+    for (int i = 0; i < greenAreaList.size(); i++)
+        delete greenAreaList[i];
+
+    animalsList.clear();
     chickList.clear();
     cowList.clear();
-
-    for (int i = 0; i < (int)animalsList.size(); i++)
-        delete animalsList[i];
-    animalsList.clear();
-
-    for (int i = 0; i < (int)ItemList.size(); i++)
-        delete ItemList[i];
     ItemList.clear();
-
-    for (int i = 0; i < (int)greenAreaList.size(); i++)
-        delete greenAreaList[i];
     greenAreaList.clear();
 
     delete gameToolbar;
@@ -632,16 +630,13 @@ void Game::sellmilk() {
     budget += 200;
 }
 void Game::restartGame() {
-    // FIX: clear typed lists FIRST so they never hold dangling pointers
-    // while the master list is being deleted below
-    chickList.clear();
-    cowList.clear();
 
     for (int i = 0; i < (int)animalsList.size(); i++) {
         delete animalsList[i];
     }
     animalsList.clear();
-
+    chickList.clear();
+    cowList.clear();
     budget = 1000;
     totalFoodConsumed = 0;
     timer = 60 + (level - 1) * 30;
@@ -961,11 +956,11 @@ void Game::redrawScene() const {
 
     for (int i = 0; i < (int)ItemList.size(); i++) {
         if (ItemList[i]->type == "egg")
-            tryDrawJpeg(pWind, "images/egg.jpg",
-                ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
+            pWind->DrawImage("images\\egg.jpg", ItemList[i]->pos.x,
+                ItemList[i]->pos.y, 30, 30);
         else if (ItemList[i]->type == "milk")
-            tryDrawJpeg(pWind, "images/milk.jpg",
-                ItemList[i]->pos.x, ItemList[i]->pos.y, 30, 30);
+            pWind->DrawImage("images\\milk.jpg", ItemList[i]->pos.x,
+                ItemList[i]->pos.y, 30, 30);
     }
     for (int i = 0; i < (int)greenAreaList.size(); i++) {
         if (!greenAreaList[i]->active)
@@ -1103,7 +1098,6 @@ void Game::loadGame() {
         p.x = x;
         p.y = y;
         Wolf* w = new Wolf(this, p, 70, 70, "images/wolff.jpg");
-        w->health = 5; // FIX: wolves loaded from save must have health initialised
         animalsList.push_back(w);
     }
 
@@ -1246,12 +1240,6 @@ void Game::go() {
     lasttime = time(0);
 
     do {
-        // FIX: handle restart flag here, outside any iteration over game lists
-        if (pendingRestart) {
-            pendingRestart = false;
-            restartGame();
-        }
-
         if (!isPaused) {
             updateTimer();
 
@@ -1279,48 +1267,37 @@ void Game::go() {
                 }
             }
             else {
-                // FIX: only run play-area logic when the click is NOT in a UI bar
-                bool inToolbar = (y >= 0 && y < config.toolBarHeight);
-                bool inBudgetbar = (y >= config.toolBarHeight && y < 2 * config.toolBarHeight);
+                collectItems(x, y);
 
-                if (inToolbar) {
+                // Wolf click: decrement health, remove when health reaches 0
+                for (int i = 0; i < (int)animalsList.size(); i++)
+                {
+                    Wolf* wolf = dynamic_cast<Wolf*>(animalsList[i]);
+                    if (!wolf) continue;
+                    point wp = wolf->getPosition();
+                    if (x >= wp.x && x <= wp.x + 70 && y >= wp.y && y <= wp.y + 70)
+                    {
+                        wolf->health--;
+                        if (wolf->health <= 0)
+                        {
+                            animalsList.erase(animalsList.begin() + i);
+                            delete wolf;
+                            printMessage("Wolf defeated!");
+                            redrawScene();
+                        }
+                        break; // one wolf hit per click
+                    }
+                }
+
+                if (isWarehouseClicked(x, y)) {
+                    openWarehouseWindow();
+                }
+
+                if (y >= 0 && y < config.toolBarHeight) {
                     isExit = gameToolbar->handleClick(x, y);
                 }
-                else if (inBudgetbar) {
+                else if (y >= config.toolBarHeight && y < 2 * config.toolBarHeight) {
                     isExit = gameBudgetbar->handleClick(x, y);
-                }
-                else {
-                    // Play-area click only
-                    collectItems(x, y);
-
-                    // Wolf click: decrement health, remove when health reaches 0
-                    Wolf* wolfToDelete = nullptr;
-                    for (int i = 0; i < (int)animalsList.size(); i++)
-                    {
-                        Wolf* wolf = dynamic_cast<Wolf*>(animalsList[i]);
-                        if (!wolf) continue;
-                        point wp = wolf->getPosition();
-                        if (x >= wp.x && x <= wp.x + 70 && y >= wp.y && y <= wp.y + 70)
-                        {
-                            wolf->health--;
-                            if (wolf->health <= 0)
-                            {
-                                wolfToDelete = wolf;
-                                animalsList.erase(animalsList.begin() + i);
-                            }
-                            break;
-                        }
-                    }
-                    if (wolfToDelete)
-                    {
-                        delete wolfToDelete;
-                        printMessage("Wolf defeated!");
-                        redrawScene();
-                    }
-
-                    if (isWarehouseClicked(x, y)) {
-                        openWarehouseWindow();
-                    }
                 }
             }
         }

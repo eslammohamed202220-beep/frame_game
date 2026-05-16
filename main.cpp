@@ -1,9 +1,18 @@
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <cstdlib>
 
 #include "./Core/Game.h"
+
 int main()
 {
-	//Create an object of controller
-	Game game;
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	game.go();
+    {
+        
+        Game game;
+        game.go();
+    }
+
+    return 0;
 }

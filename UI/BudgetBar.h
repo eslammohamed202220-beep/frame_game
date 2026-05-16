@@ -1,10 +1,13 @@
 #pragma once
 #include "../Core/Drawable.h"
-#include "../Entities/Animal.h"
 #include "../Config/GameConfig.h"
-#include <random>
-#include <limits>
 #include <vector>
+
+// Forward declarations — full Animal.h is only needed in BudgetBar.cpp
+class Animal;
+class Chick;
+class Cow;
+class Wolf;
 
 //Ranges for generating a random location for the animals
 const int range_min_x = 0;

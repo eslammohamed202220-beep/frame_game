@@ -1,6 +1,7 @@
 #include "Budgetbar.h"
 #include "../Config/GameConfig.h"
 #include "../Core/Game.h"
+#include "../Entities/Animal.h"   // full type needed here for Chick/Cow/Wolf construction
 #include "../CMUgraphicsLib/error.h"
 #include <iostream>
 using namespace std;
