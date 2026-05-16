@@ -409,33 +409,42 @@ void Game::updatePlayerHighScore(int score) {
 }
 
 void Game::promptUsername() {
-  const int cx = config.windWidth / 2;
-  const int cy = config.windHeight / 2;
-  const int panelL = cx - 300;
-  const int panelR = cx + 300;
-  const int panelT = cy - 100;
-  const int panelB = cy + 105;
-  const int inputY = cy + 25;
+  static const char *kUsernameUi[] = {
+      "images/Username interface.jpg",
+      "images\\Username interface.jpg",
+      "../images/Username interface.jpg",
+      "..\\images\\Username interface.jpg",
+  };
+
+  const int playY = 2 * config.toolBarHeight;
+  const int playBottom = config.windHeight - config.statusBarHeight;
+  const int playH = playBottom - playY;
+  const int inputY = playY + playH / 2 + 18;
 
   auto drawDialog = [&](const string &typed) {
-    redrawScene();
-    pWind->SetPen(BLACK, 2);
-    pWind->SetBrush(LIGHTGRAY);
-    pWind->DrawRectangle(panelL, panelT, panelR, panelB, FILLED);
-    pWind->SetPen(BLUE, 2);
-    pWind->DrawRectangle(panelL, panelT, panelR, panelB, FRAME);
-    pWind->SetPen(BLACK, 1);
-    pWind->SetFont(28, BOLD, BY_NAME, "Arial");
-    pWind->DrawString(cx - 110, cy - 70, "Enter Username");
-    pWind->SetFont(16, BOLD, BY_NAME, "Arial");
-    pWind->DrawString(cx - 200, cy - 30, "Type your name, then press ENTER");
+    drawTopBars();
+    clearStatusBar();
 
-    pWind->SetBrush(WHITE);
-    pWind->SetPen(BLACK, 2);
-    pWind->DrawRectangle(cx - 220, inputY, cx + 220, inputY + 36, FILLED);
-    pWind->DrawRectangle(cx - 220, inputY, cx + 220, inputY + 36, FRAME);
-    pWind->SetFont(20, BOLD, BY_NAME, "Arial");
-    pWind->DrawString(cx - 210, inputY + 8, typed.empty() ? " " : typed);
+    if (!drawFirstMatch(*pWind, kUsernameUi,
+                        sizeof(kUsernameUi) / sizeof(kUsernameUi[0]), 0, playY,
+                        config.windWidth, playH)) {
+      const int cx = config.windWidth / 2;
+      const int cy = playY + playH / 2;
+      pWind->SetBrush(LIGHTGRAY);
+      pWind->SetPen(BLACK, 2);
+      pWind->DrawRectangle(cx - 300, cy - 100, cx + 300, cy + 100, FILLED);
+      pWind->SetFont(20, BOLD, BY_NAME, "Arial");
+      pWind->DrawString(cx - 150, cy - 10, "Username UI image not found");
+    }
+
+    if (!typed.empty()) {
+      pWind->SetPen(BLACK, 1);
+      pWind->SetFont(26, BOLD, BY_NAME, "Arial");
+      int textW = 0, textH = 0;
+      pWind->GetStringSize(textW, textH, typed);
+      pWind->DrawString(config.windWidth / 2 - textW / 2, inputY, typed);
+    }
+
     pWind->UpdateBuffer();
   };
 
@@ -461,9 +470,9 @@ void Game::promptUsername() {
   }
 
   playerName = sanitizeUsername(label);
+  redrawScene();
   printMessage("Welcome, " + playerName + "!");
   pWind->UpdateBuffer();
-  Sleep(400);
 }
 
 void Game::gameOver() {
@@ -637,6 +646,14 @@ void Game::restartGame() {
   ItemList.clear();
 
   redrawScene();
+}
+
+void Game::drawTopBars() const {
+  pWind->SetPen(config.bkGrndColor, 1);
+  pWind->SetBrush(config.bkGrndColor);
+  pWind->DrawRectangle(0, 0, config.windWidth, 2 * config.toolBarHeight, FILLED);
+  gameToolbar->draw();
+  gameBudgetbar->draw();
 }
 
 void Game::drawBackground() const {
@@ -920,6 +937,7 @@ void Game::openWarehouseWindow() {
   }
 }
 void Game::redrawScene() const {
+  drawTopBars();
   drawBackground();
   drawWarehouse();
   drawFieldBoundaries();
@@ -951,8 +969,6 @@ void Game::redrawScene() const {
                       to_string(greenAreaList[i]->counter));
   }
 
-  gameToolbar->draw();
-  gameBudgetbar->draw();
   printBudget("BUDGET = $" + to_string(budget));
   writeStatus();
   pWind->UpdateBuffer();
@@ -1137,8 +1153,6 @@ void Game::go() {
   promptUsername();
   gameStarted = true;
   lasttime = time(0);
-  writeStatus();
-  pWind->UpdateBuffer();
 
   do {
     if (!isPaused) {

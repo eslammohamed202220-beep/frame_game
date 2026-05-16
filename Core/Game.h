@@ -105,6 +105,7 @@ public:
 	void animalCounter() const;
 
 	// Drawing helpers
+	void drawTopBars() const;
 	void drawBackground() const;
 	void drawWarehouse() const;
 	void drawFieldBoundaries() const;
