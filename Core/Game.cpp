@@ -707,7 +707,7 @@ void Game::drawGreenArea() {
   GreenArea *newArea = new GreenArea();
   newArea->x = foodX + rand() % (foodW - areaW);
   newArea->y = foodY + rand() % (foodH - areaH);
-  newArea->counter = 10;
+  newArea->counter = 2;
   newArea->active = true;
   newArea->eatTimer = 0;
 
